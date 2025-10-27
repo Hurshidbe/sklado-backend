@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { CustomersModule } from './modules/customers/customers.module';
 import { DeliverModule } from './modules/deliver/deliver.module';
-import { ProductModule } from './modules/product/product.module';
-import { DeliverSeed } from './modules/deliver/deliver.seed';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Deliver, DeliverSchema } from './modules/deliver/entities/deliver.entity';
+import { AuthModule } from './modules/auth/auth.module';
+import { MarketsModule } from './modules/markets/markets.module';
+import { ProductsModule } from './modules/products/products.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import * as dotenv from 'dotenv'
+import { Deliver, DeliverSchema } from './modules/deliver/entities/deliver.entity';
+import { DeliverSeed } from './modules/deliver/deliver.seed';
 dotenv.config()
 
 @Module({
@@ -13,7 +15,7 @@ dotenv.config()
      MongooseModule.forFeature([
           {name : Deliver.name, schema : DeliverSchema}
         ]),
-     CustomersModule, ProductModule,],
+     AuthModule, MarketsModule, ProductsModule, OrdersModule,],
   
   controllers: [],
   providers: [DeliverSeed],
