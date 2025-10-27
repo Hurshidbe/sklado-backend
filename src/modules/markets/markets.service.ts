@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Market } from './entities/market.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class MarketsService {
-  create(createMarketDto: CreateMarketDto) {
-    return 'This action adds a new market';
+  constructor(@InjectModel(Market.name) private readonly MarketRepo : Model<Market>){}
+
+  async create(createMarketDto: CreateMarketDto) {
+    return await this.MarketRepo.create(createMarketDto);
   }
 
-  findAll() {
-    return `This action returns all markets`;
+  async findAll() {
+    return await this.MarketRepo.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} market`;
+  async findOne(id: string) {
+    return await this.MarketRepo.findById(id)
   }
 
-  update(id: number, updateMarketDto: UpdateMarketDto) {
-    return `This action updates a #${id} market`;
+  async update(id: string, updateMarketDto: UpdateMarketDto) {
+    return await this.MarketRepo.findByIdAndUpdate(id, {...updateMarketDto}, {new : true})
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} market`;
+  async remove(id: string) {
+    return await this.MarketRepo.deleteOne({_id:id},);
   }
 }
