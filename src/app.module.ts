@@ -8,6 +8,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 import * as dotenv from 'dotenv'
 import { Deliver, DeliverSchema } from './modules/deliver/entities/deliver.entity';
 import { DeliverSeed } from './modules/deliver/deliver.seed';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 dotenv.config()
 
 @Module({
@@ -15,6 +17,18 @@ dotenv.config()
      MongooseModule.forFeature([
           {name : Deliver.name, schema : DeliverSchema}
         ]),
+
+        JwtModule.registerAsync({
+          global : true,
+          imports : [ConfigModule],
+          inject : [ConfigService],
+          useFactory:(ConfigService : ConfigService) =>{
+            return {
+              secret : ConfigService.get('JWT'),
+              signOptions :{expiresIn : '1h'}
+            }
+          }
+        }),
      AuthModule, MarketsModule, ProductsModule, OrdersModule,],
   
   controllers: [],
