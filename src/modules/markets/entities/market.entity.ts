@@ -11,6 +11,9 @@ export class Market extends Document {
 
     @Prop()
     password : string
+
+    @Prop({default : 'market'})
+    role? : string
 }
 
 export const MarketSchema = SchemaFactory.createForClass(Market);

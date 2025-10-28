@@ -13,7 +13,7 @@ import {
 import { MarketsService } from './markets.service';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
-import AuthGuard from 'src/guards/authguard';
+import AuthGuard from 'src/guards/deliverGuard';
 
 @UseGuards(AuthGuard)
 @Controller('markets')

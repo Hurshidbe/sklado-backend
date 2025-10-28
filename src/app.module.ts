@@ -10,6 +10,8 @@ import { Deliver, DeliverSchema } from './modules/deliver/entities/deliver.entit
 import { DeliverSeed } from './modules/deliver/deliver.seed';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import DeliverGuard from './guards/deliverGuard';
+import MarketGuard from './guards/marketGuard';
 dotenv.config()
 
 @Module({
@@ -32,6 +34,6 @@ dotenv.config()
      AuthModule, MarketsModule, ProductsModule, OrdersModule,],
   
   controllers: [],
-  providers: [DeliverSeed],
+  providers: [DeliverSeed, DeliverGuard, MarketGuard],
 })
 export class AppModule {}

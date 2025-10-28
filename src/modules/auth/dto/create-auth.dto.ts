@@ -7,3 +7,11 @@ export class LoginDeliverDto {
     @IsString()
     password : string
 }
+
+export class LoginMarketDto {
+    @IsString()
+    phone : string
+
+    @IsString()
+    password : string
+}

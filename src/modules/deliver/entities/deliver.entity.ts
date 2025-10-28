@@ -11,6 +11,9 @@ export class Deliver extends Document {
 
   @Prop()
   password : string
+
+  @Prop()
+  role : string
 }
 
 export const DeliverSchema = SchemaFactory.createForClass(Deliver);
