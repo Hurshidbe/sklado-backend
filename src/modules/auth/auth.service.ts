@@ -29,7 +29,7 @@ export class AuthService {
 }
 
   findAll() {
-    return `This action returns all auth`;
+    return `This action returns all `;
   }
 
   findOne(id: number) {
