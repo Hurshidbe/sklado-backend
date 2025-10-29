@@ -8,11 +8,11 @@ import { Http2ServerRequest } from 'http2';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import DeliverGuard from 'src/guards/deliverGuard';
 
+@UseGuards(MarketGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @UseGuards(MarketGuard)
   @Post()
   async create(@Body() body : CreateOrderDto, @Req()req: any){
     try {
@@ -22,13 +22,36 @@ export class OrdersController {
     }
   }
 
-  @UseGuards(DeliverGuard)
-  @Get()
-  async all(){
+  @Get(':id')
+  async getById(@Param('id') id : string , @Req() req : any){
     try {
-      return await this.ordersService.findAll()
+      return await this.ordersService.findOne(id , req.market.id)
     } catch (error) {
       throw new HttpException(error.message , error.status)
     }
   }
+
+  @Patch(':id')
+  async update(
+  @Param('id') id: string,
+  @Body() body: CreateOrderDto,
+  @Req() req: any,
+) {
+  try {
+    return await this.ordersService.update(id, req.market.id, body);
+  } catch (error) {
+    throw new HttpException(error.message, error.status);
+  }
 }
+
+@Delete(':id')
+async remove(@Param('id') id: string, @Req() req: any) {
+  try {
+    return await this.ordersService.remove(id, req.market.id);
+  } catch (error) {
+    throw new HttpException(error.message, error.status);
+  }
+}
+
+}
+

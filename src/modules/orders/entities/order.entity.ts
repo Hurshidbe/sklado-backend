@@ -18,6 +18,9 @@ export class Order extends Document {
         }
     ])
     products : {productId : Product ; quantity : number}[]
+
+    @Prop({enum :['new' , 'accepted', 'rejected', 'delivered'], default : 'new'})
+    status : string
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order)

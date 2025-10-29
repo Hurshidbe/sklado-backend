@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
@@ -37,15 +37,48 @@ export class OrdersService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: string , marketId : string) {
+    await this.isOwnOrder(id , marketId)
+    return await this.orderRepo.findById(id);
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
+  await this.isOwnOrder(orderId , marketId)
+  const order = await this.orderRepo.findById(orderId);
+  if (!order) throw new NotFoundException('Order not found');
+  if (order.status !== 'new')
+    throw new BadRequestException(`your order already ${order.status}. you can not edit it` );
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
-  }
+  order.products = updateData.products.map(item => ({
+  productId: item.productId,
+  quantity: item.quantity,
+})) as any;
+  await order.save();
+  return order;
+}
+
+
+  // orders.service.ts
+async remove(orderId: string, marketId: string) {
+  await this.isOwnOrder(orderId, marketId);
+  const order = await this.orderRepo.findById(orderId);
+  if (!order) throw new NotFoundException('Order not found');
+  if (order.status !== 'new')
+    throw new BadRequestException(
+      `Your order is already ${order.status}. You cannot delete it.`,
+    );
+
+  await this.orderRepo.findByIdAndDelete(orderId);
+  return { message: 'Order deleted successfully' };
+}
+
+
+ async isOwnOrder(orderId: string, marketId: string): Promise<boolean> {
+  const order = await this.orderRepo.findById(orderId);
+  if (!order) return false;
+  if (order.marketId?.toString() !== marketId.toString()) throw new BadRequestException('you can edit / see only your own orders');
+  return true;
+}
+
+
 }

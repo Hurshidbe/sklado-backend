@@ -1,34 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException } from '@nestjs/common';
 import { DeliverService } from './deliver.service';
 import { CreateDeliverDto } from './dto/create-deliver.dto';
 import { UpdateDeliverDto } from './dto/update-deliver.dto';
+import MarketGuard from 'src/guards/marketGuard';
+import { OrdersService } from '../orders/orders.service';
+import DeliverGuard from 'src/guards/deliverGuard';
 
 @Controller('deliver')
 export class DeliverController {
-  constructor(private readonly deliverService: DeliverService) {}
+  constructor(
+    private readonly deliverService: DeliverService,
+    private readonly orderService : OrdersService
+  ) {}
 
-  @Post()
-  create(@Body() createDeliverDto: CreateDeliverDto) {
-    return this.deliverService.create(createDeliverDto);
-  }
-
+  @UseGuards(DeliverGuard)
   @Get()
-  findAll() {
-    return this.deliverService.findAll();
+  async all(){
+    try {
+      return await this.orderService.findAll()        
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.deliverService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeliverDto: UpdateDeliverDto) {
-    return this.deliverService.update(+id, updateDeliverDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deliverService.remove(+id);
-  }
+  // 1)add filter for orders (by date to date , status , by market ....)
 }
