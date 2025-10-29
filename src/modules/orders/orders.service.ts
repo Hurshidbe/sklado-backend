@@ -4,7 +4,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { Product } from '../products/entities/product.entity';
 import { Market } from '../markets/entities/market.entity';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Http2ServerRequest } from 'http2';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
@@ -18,10 +18,8 @@ export class OrdersService {
     @InjectModel(Market.name) private marketRepo: Model<Market>,
   ){}
 
-  async create(body: CreateOrderDto) {
-    const market =await this.marketRepo.findById(body.marketId)
-    if(!market) throw new NotFoundException('market not found')
-
+  async create(body: CreateOrderDto , marketId :string) {
+    body.marketId =marketId
     for(const item of body.products){
       const product = await this.productRepo.findById(item.productId)
       if(!product) throw new NotFoundException (`Product ${item.productId} not found`)
@@ -31,8 +29,12 @@ export class OrdersService {
     return order.save()
     }
 
-  findAll() {
-    return `This action returns all orders`;
+  async findAll() {
+    try {
+      return await this.orderRepo.find()
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
   }
 
   findOne(id: number) {

@@ -1,5 +1,5 @@
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose'; // <-- bu qatorda Document import qilindi
+import mongoose, { Document } from 'mongoose'; 
 import { Market, MarketSchema } from '../markets/entities/market.entity'; 
 import { Product, ProductSchema } from '../products/entities/product.entity'; 
 import { Module } from '@nestjs/common';

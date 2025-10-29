@@ -10,9 +10,7 @@ class ProductItem {
 }
 
 export class CreateOrderDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  marketId: string;
+  marketId?: string;
 
   @IsArray()
   products: ProductItem[];

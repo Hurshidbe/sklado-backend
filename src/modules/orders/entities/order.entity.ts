@@ -9,7 +9,7 @@ import mongoose, { Document } from "mongoose";
 
 export class Order extends Document {
     @Prop({type : mongoose.Schema.Types.ObjectId , ref : 'Market'})
-    marketId : Market
+    marketId? : Market
 
     @Prop([
         {

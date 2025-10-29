@@ -13,7 +13,7 @@ class MarketGuard implements CanActivate{
             try {
         const decoded = await this.jwt.verifyAsync(token)
         if(decoded.role !== 'market') throw new BadRequestException('this route is not for you')
-        req.user = decoded
+        req.market = decoded
                 return true
             } catch (error) {
                 throw new HttpException('token expired please relogin', 403)
