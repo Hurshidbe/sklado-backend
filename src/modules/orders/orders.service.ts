@@ -19,6 +19,7 @@ export class OrdersService {
   ){}
 
   async create(body: CreateOrderDto , marketId :string) {
+    await this.limitedCreate(marketId)
     body.marketId =marketId
     for(const item of body.products){
       const product = await this.productRepo.findById(item.productId)
@@ -57,8 +58,6 @@ async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   return order;
 }
 
-
-  // orders.service.ts
 async remove(orderId: string, marketId: string) {
   await this.isOwnOrder(orderId, marketId);
   const order = await this.orderRepo.findById(orderId);
@@ -72,13 +71,18 @@ async remove(orderId: string, marketId: string) {
   return { message: 'Order deleted successfully' };
 }
 
-
- async isOwnOrder(orderId: string, marketId: string): Promise<boolean> {
+async isOwnOrder(orderId: string, marketId: string): Promise<boolean> {
   const order = await this.orderRepo.findById(orderId);
   if (!order) return false;
   if (order.marketId?.toString() !== marketId.toString()) throw new BadRequestException('you can edit / see only your own orders');
   return true;
 }
 
-
+async limitedCreate(marketId: string) {
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+  const orders = await this.orderRepo.find({ marketId : marketId, createdAt: { $gte: startOfToday }})
+  if (orders.length !== 0) throw new BadRequestException('daily order creating limit reached')
+  return true
+}
 }

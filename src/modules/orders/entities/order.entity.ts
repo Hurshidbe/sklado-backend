@@ -5,8 +5,7 @@ import { Product } from "src/modules/products/entities/product.entity";
 import mongoose, { Document } from "mongoose";
 
 
-@Schema()
-
+@Schema({timestamps : true})
 export class Order extends Document {
     @Prop({type : mongoose.Schema.Types.ObjectId , ref : 'Market'})
     marketId? : Market

@@ -9,11 +9,6 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
         name? : string
     
         @IsOptional()
-        @IsNumber()
-        @Max(999999999)
-        price? : number
-    
-        @IsOptional()
         @IsString()
         unit? : string
 }

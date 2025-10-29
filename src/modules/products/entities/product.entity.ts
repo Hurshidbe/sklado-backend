@@ -7,10 +7,7 @@ export class Product extends Document {
     @Prop({unique : true})
     name : string
 
-    @Prop()
-    price : number
-
-    @Prop({enum :['piece', 'liter', 'kg']})
+    @Prop({enum :['piece', 'liter', 'kg', 'm' ]})
     unit : string
 }
 

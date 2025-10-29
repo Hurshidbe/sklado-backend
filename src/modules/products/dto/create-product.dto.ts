@@ -5,11 +5,6 @@ export class CreateProductDto {
     @Length(1,100)
     name : string
 
-    @IsNumber()
-    @Max(999999999)
-    price : number
-
-
     @IsString()
     unit : string
 }
