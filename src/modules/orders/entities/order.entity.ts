@@ -18,7 +18,7 @@ export class Order extends Document {
     ])
     products : {productId : Product ; quantity : number}[]
 
-    @Prop({enum :['new' , 'accepted', 'rejected', 'delivered'], default : 'new'})
+    @Prop({enum :['new' , 'accepted', 'delivered'], default : 'new'})
     status : string
 }
 

@@ -30,13 +30,31 @@ export class OrdersService {
     return order.save()
     }
 
-  async findAll() {
-    try {
-      return await this.orderRepo.find()
-    } catch (error) {
-      throw new HttpException(error.message , error.status)
-    }
+  async findAll(filter: { market?: string; status?: string; from?: string; to?: string }) {
+  const query: any = {};
+
+  if (filter.market) query.marketId = filter.market;
+  if (filter.status) query.status = filter.status;
+
+  if (filter.from || filter.to) {
+    query.createdAt = {};
+    if (filter.from) query.createdAt.$gte = new Date(filter.from);
+    if (filter.to) query.createdAt.$lte = new Date(filter.to);
   }
+
+  const orders = await this.orderRepo
+    .find(query, '-__v')
+    .populate('marketId', 'name phone')
+    .populate('products.productId', 'name')
+    .lean();
+
+  if (!orders.length) throw new NotFoundException('Orders not found');
+
+  return orders;
+}
+
+
+
 
   async findOne(id: string , marketId : string) {
     await this.isOwnOrder(id , marketId)

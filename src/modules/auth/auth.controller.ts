@@ -31,10 +31,18 @@ export class AuthController {
       throw new HttpException(error.message , error.status)
      }
   }
+  @Delete('deliver-logout')
+  @UseGuards(DeliverGuard)
+     async logoutDeliver(@Res() res: any) {
+     res.clearCookie('AuthToken')
+     return res.send('deliver logout success')
+}
 
-
-
+  @Delete('market-logout')
   @UseGuards(MarketGuard)
-  @Get()
-  async get(){return 'hello'}
+     async logoutMarket(@Res() res: any) {
+     res.clearCookie('AuthToken')
+     return res.send('market logout success')
+}
+
 }

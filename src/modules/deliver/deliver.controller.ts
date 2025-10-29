@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException, Query } from '@nestjs/common';
 import { DeliverService } from './deliver.service';
 import { CreateDeliverDto } from './dto/create-deliver.dto';
 import { UpdateDeliverDto } from './dto/update-deliver.dto';
@@ -15,13 +15,18 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Get()
-  async all(){
+  async all(@Query() query : any){
     try {
-      return await this.orderService.findAll()        
+      return await this.orderService.findAll(query)        
     } catch (error) {
       throw new HttpException(error.message , error.status)
     }
   }
 
   // 1)add filter for orders (by date to date , status , by market ....)
+  // 2)status changes logics for orders 
+  // 
+
+
+  
 }
