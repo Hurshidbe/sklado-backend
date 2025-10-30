@@ -14,7 +14,7 @@ export class DeliverController {
   ) {}
 
   @UseGuards(DeliverGuard)
-  @Get()
+  @Get('orders')
   async all(@Query() query : any){
     try {
       return await this.orderService.findAll(query)        
@@ -23,10 +23,28 @@ export class DeliverController {
     }
   }
 
-  // 1)add filter for orders (by date to date , status , by market ....)
-  // 2)status changes logics for orders 
-  // 
+  @UseGuards(DeliverGuard)
+  @Patch(':id/accept')
+  async acceptOrder(@Param('id') id : string){
+    try {
+      return await this.orderService.setAccepted(id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
 
-
+  @UseGuards(DeliverGuard)
+  @Patch(':id/delivered')
+  async deliveOrder(@Param('id') id : string){
+    try {
+      return await this.orderService.setDelivered(id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
   
+  
+  
+  // 2)status changes logics for orders many
+  // 3) weekly limit for products
 }

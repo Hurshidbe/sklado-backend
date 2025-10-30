@@ -22,6 +22,15 @@ export class OrdersController {
     }
   }
 
+  @Get()
+  async ownOrders(@Req() req : any){
+    try {
+      return await this.ordersService.findAllOwn(req.market.id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
+
   @Get(':id')
   async getById(@Param('id') id : string , @Req() req : any){
     try {
@@ -51,7 +60,6 @@ async remove(@Param('id') id: string, @Req() req: any) {
   } catch (error) {
     throw new HttpException(error.message, error.status);
   }
-}
-
+} 
 }
 

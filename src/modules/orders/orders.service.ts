@@ -32,14 +32,12 @@ export class OrdersService {
 
   async findAll(filter: { market?: string; status?: string; from?: string; to?: string }) {
   const query: any = {};
-
-  if (filter.market) query.marketId = filter.market;
-  if (filter.status) query.status = filter.status;
-
+  if (filter.market) query.marketId = filter.market
+  if (filter.status) query.status = filter.status
   if (filter.from || filter.to) {
-    query.createdAt = {};
-    if (filter.from) query.createdAt.$gte = new Date(filter.from);
-    if (filter.to) query.createdAt.$lte = new Date(filter.to);
+    query.createdAt = {}
+    if (filter.from) query.createdAt.$gte = new Date(filter.from)
+    if (filter.to) query.createdAt.$lte = new Date(filter.to)
   }
 
   const orders = await this.orderRepo
@@ -47,16 +45,14 @@ export class OrdersService {
     .populate('marketId', 'name phone')
     .populate('products.productId', 'name')
     .lean();
-
   if (!orders.length) throw new NotFoundException('Orders not found');
-
   return orders;
 }
+async findAllOwn(marketId : string){
+  return await this.orderRepo.find({marketId})
+}
 
-
-
-
-  async findOne(id: string , marketId : string) {
+async findOne(id: string , marketId : string) {
     await this.isOwnOrder(id , marketId)
     return await this.orderRepo.findById(id);
   }
@@ -75,6 +71,14 @@ async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   await order.save();
   return order;
 }
+
+async setAccepted(orderId : string){
+  return await this.orderRepo.findByIdAndUpdate(orderId , {status : 'accepted'}, {new : true})
+}
+
+async setDelivered(orderId : string){
+  return await this.orderRepo.findByIdAndUpdate(orderId , {status : 'delivered'}, {new : true})
+} 
 
 async remove(orderId: string, marketId: string) {
   await this.isOwnOrder(orderId, marketId);
