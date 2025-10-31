@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { OrdersModule } from '../orders/orders.module';
 import { DeliverService } from './deliver.service';
 import { DeliverController } from './deliver.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,13 +13,14 @@ import { MarketsService } from '../markets/markets.service';
 
 @Module({
   imports : [
+     OrdersModule,
      MongooseModule.forFeature([
        {name : Order.name , schema : OrderSchema},
        {name : Market.name , schema : MarketSchema},
        {name : Product.name , schema : ProductSchema}
-    ])
-  ],
+     ])
+   ],
   controllers: [DeliverController],
-  providers: [DeliverService, OrdersService , MarketsService],
+  providers: [DeliverService, MarketsService],
 })
 export class DeliverModule {}

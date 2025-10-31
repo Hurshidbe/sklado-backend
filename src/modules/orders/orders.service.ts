@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Http2ServerRequest } from 'http2';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { error } from 'console';
+import { ProductLimitService } from '../product-limit/product-limit.service';
 
 @Injectable()
 export class OrdersService {
@@ -16,6 +17,7 @@ export class OrdersService {
     @InjectModel(Order.name) private orderRepo: Model<Order>,
     @InjectModel(Product.name) private productRepo: Model<Product>,
     @InjectModel(Market.name) private marketRepo: Model<Market>,
+    private readonly productLimitService : ProductLimitService
   ){}
 
   async create(body: CreateOrderDto , marketId :string) {
@@ -24,6 +26,11 @@ export class OrdersService {
     for(const item of body.products){
       const product = await this.productRepo.findById(item.productId)
       if(!product) throw new NotFoundException (`Product ${item.productId} not found`)
+        await this.productLimitService.checkProductLimit(
+      item.productId.toString(),
+      marketId,
+      item.quantity,
+    );
     }
     
     const order = new this.orderRepo(body);

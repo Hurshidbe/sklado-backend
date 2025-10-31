@@ -43,8 +43,7 @@ export class DeliverController {
     }
   }
   
-  
-  
-  // 2)status changes logics for orders many
-  // 3) weekly limit for products
+  // 2) weekly limit for products
+  // 3) excel integration
+  // 4) bot link
 }

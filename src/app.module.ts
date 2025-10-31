@@ -10,6 +10,7 @@ import { Deliver, DeliverSchema } from './modules/deliver/entities/deliver.entit
 import { DeliverSeed } from './modules/deliver/deliver.seed';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductLimitModule } from './modules/product-limit/product-limit.module';
 import DeliverGuard from './guards/deliverGuard';
 import MarketGuard from './guards/marketGuard';
 dotenv.config()
@@ -31,7 +32,7 @@ dotenv.config()
             }
           }
         }),
-     AuthModule, MarketsModule, ProductsModule, OrdersModule,],
+     AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule,],
   
   controllers: [],
   providers: [DeliverSeed, DeliverGuard, MarketGuard],
