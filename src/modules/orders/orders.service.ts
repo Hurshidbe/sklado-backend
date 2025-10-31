@@ -32,7 +32,6 @@ export class OrdersService {
       item.quantity,
     );
     }
-    
     const order = new this.orderRepo(body);
     return order.save()
     }
@@ -65,16 +64,26 @@ async findOne(id: string , marketId : string) {
   }
 
 async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
-  await this.isOwnOrder(orderId , marketId)
+  await this.isOwnOrder(orderId, marketId);
   const order = await this.orderRepo.findById(orderId);
   if (!order) throw new NotFoundException('Order not found');
   if (order.status !== 'new')
-    throw new BadRequestException(`your order already ${order.status}. you can not edit it` );
+    throw new BadRequestException(`your order already ${order.status}. you can not edit it`);
 
+  for (const item of updateData.products) {
+    const product = await this.productRepo.findById(item.productId);
+    if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
+    await this.productLimitService.checkProductLimit(
+      item.productId.toString(),
+      marketId,
+      item.quantity,
+    );
+  }
   order.products = updateData.products.map(item => ({
-  productId: item.productId,
-  quantity: item.quantity,
-})) as any;
+    productId: item.productId,
+    quantity: item.quantity,
+  })) as any;
+
   await order.save();
   return order;
 }

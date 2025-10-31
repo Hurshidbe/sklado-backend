@@ -6,13 +6,15 @@ import { ProductLimit, ProductLimitSchema } from './entities/product-limit.entit
 import { Order, OrderSchema } from '../orders/entities/order.entity';
 import { OrdersService } from '../orders/orders.service';
 import { OrdersModule } from '../orders/orders.module';
+import { Product, ProductSchema } from '../products/entities/product.entity';
 
 @Module({
   imports : [
       forwardRef(() => OrdersModule),
     MongooseModule.forFeature([
       {name : ProductLimit.name , schema : ProductLimitSchema},
-      {name : Order.name , schema : OrderSchema}
+      {name : Order.name , schema : OrderSchema},
+      {name : Product.name , schema : ProductSchema}
     ])
   ],
   controllers: [ProductLimitController],

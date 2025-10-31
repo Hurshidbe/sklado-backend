@@ -5,12 +5,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ProductLimit } from './entities/product-limit.entity';
 import { Model } from 'mongoose';
 import { Order } from '../orders/entities/order.entity';
+import { Product } from '../products/entities/product.entity';
 
 @Injectable()
 export class ProductLimitService {
   constructor(
     @InjectModel(ProductLimit.name) private readonly LimitsRepo : Model<ProductLimit>,
-    @InjectModel(Order.name) private readonly OrderRepo : Model<Order>
+    @InjectModel(Order.name) private readonly OrderRepo : Model<Order>,
+    @InjectModel(Product.name) private readonly ProductRepo : Model<Product>
   ){}
 
   async create(createProductLimitDto: CreateProductLimitDto) {
@@ -33,22 +35,26 @@ export class ProductLimitService {
     return await this.LimitsRepo.findByIdAndDelete(id);
   }
 
-  async checkProductLimit(productId: string, marketId: string, amount: number) {
+ async checkProductLimit(productId: string, marketId: string, amount: number) {
   // 1️⃣ Limitni bazadan topamiz
   const limit = await this.LimitsRepo.findOne({ productId });
-  if (!limit) return; // agar limit mavjud bo'lmasa — cheklov yo'q
+  if (!limit) return; // agar limit mavjud bo‘lmasa — cheklov yo‘q
 
   // 2️⃣ Limitning tugash vaqtini hisoblaymiz
   const endDate = new Date(limit.startDate);
   endDate.setDate(endDate.getDate() + limit.days);
 
-  // 3️⃣ Agar limit muddati tugagan bo‘lsa — cheklov bekor
-  if (new Date() > endDate) return;
+  // 3️⃣ Agar limit muddati tugagan bo‘lsa — avtomatik yangi davr boshlaymiz
+  if (new Date() > endDate) {
+    limit.startDate = new Date(); // hozirgi sanadan yangilaymiz
+    await limit.save();
+    return; // yangi limit davri boshlandi
+  }
 
   // 4️⃣ Shu oraliqda berilgan orderlarni topamiz
   const orders = await this.OrderRepo.find({
     marketId,
-    'products.productId': productId, // agar orderda bir nechta product bo‘lsa
+    'products.productId': productId,
     createdAt: { $gte: limit.startDate, $lte: endDate },
   });
 
@@ -64,13 +70,21 @@ export class ProductLimitService {
   // 6️⃣ Qancha miqdor qoldi — shuni aniqlaymiz
   const remaining = limit.amount - totalOrdered;
 
+  // 🔍 Mahsulot nomini olish (xabar uchun)
+  const product = await this.ProductRepo.findById(productId);
+
   // 7️⃣ Tekshiruvlar
   if (remaining <= 0)
-    throw new BadRequestException('Bu mahsulot uchun limit tugagan!');
+    throw new BadRequestException(
+      `${product?.name || 'Nomaʼlum mahsulot'} uchun limit tugagan!`,
+    );
+
   if (amount > remaining)
     throw new BadRequestException(
-      `Siz faqat ${remaining} birlik zakaz bera olasiz.`,
+      `${product?.name || 'Nomaʼlum mahsulot'} uchun faqat ${remaining} birlik zakaz bera olasiz.`,
     );
 }
+
+
 
 }
