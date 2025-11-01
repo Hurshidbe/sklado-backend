@@ -19,10 +19,17 @@ export class DeliverService {
 // Service faylidagi to'g'rilangan funksiya
 
 async exportOrdersToExcel(filter: OrderFilterDto) {
-  // ✅ query uchun type qo‘shildi (xatolik yo‘qoladi)
+  // ✅ Query tip bilan xavfsiz qilindi
   const query: Record<string, any> = {};
 
-  if (filter.status) query.status = filter.status;
+  // ✅ Market bo‘yicha faqat o‘z orderlarini olish
+  if (filter.marketId) {
+    query.marketId = filter.marketId;
+  }
+
+  if (filter.status) {
+    query.status = filter.status;
+  }
 
   if (filter.from && filter.to) {
     query.createdAt = {
@@ -31,6 +38,7 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
     };
   }
 
+  // ✅ Ma’lumotlarni olish
   const orders = await this.orderRepo
     .find(query)
     .populate('products.productId')
@@ -40,18 +48,18 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
   const uniqueProducts = new Set<string>();
   const orderProductMap = new Map<string, Map<string, number>>();
 
-  // ✅ Market + Sana asosida ustun nomlari
   orders.forEach(order => {
     const marketName = order.marketId?.name || 'Noma\'lum';
-   const date = (order as any).createdAt
+    const date = (order as any).createdAt
   ? new Date((order as any).createdAt).toLocaleDateString('en-GB', {
       timeZone: 'Asia/Tashkent',
     }).replace(/\//g, '-')
   : 'Noma\'lum sana';
 
-    const orderKey = `${marketName} (${date})`;
-    const productQuantities = new Map<string, number>();
 
+    const orderKey = `${marketName} (${date})`;
+
+    const productQuantities = new Map<string, number>();
     (order.products || []).forEach((p: any) => {
       const productName = p.productId?.name || 'Noma\'lum';
       uniqueProducts.add(productName);
@@ -65,40 +73,37 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Orders');
 
-  // ✅ Ustunlarni yaratish
   const orderKeys = Array.from(orderProductMap.keys());
   worksheet.columns = [
     { header: 'Mahsulot NOMi / Bo‘g‘chalar', key: 'productName', width: 28 },
     ...orderKeys.map(key => ({
       header: key,
-      key: key,
+      key,
       width: 22,
       style: { alignment: { wrapText: true, vertical: 'middle', horizontal: 'center' } }
     })),
-    { header: 'Jami', key: 'total', width: 12 }
+    { header: 'Jami', key: 'total', width: 12 },
   ];
 
-  // ✅ Header qatorini sozlash
   const headerRow = worksheet.getRow(1);
   headerRow.height = 45;
   headerRow.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+  headerRow.font = { bold: true };
 
-  // ✅ Har bir mahsulot uchun satr + jami
   uniqueProducts.forEach(productName => {
-    const rowData: any = { productName };
+    const row: any = { productName };
     let total = 0;
 
     orderKeys.forEach(orderKey => {
       const qty = orderProductMap.get(orderKey)?.get(productName) || 0;
-      rowData[orderKey] = qty;
+      row[orderKey] = qty;
       total += qty;
     });
 
-    rowData.total = total;
-    worksheet.addRow(rowData);
+    row.total = total;
+    worksheet.addRow(row);
   });
 
-  // ✅ Yakuniy "JAMI" qatori
   const totalRow: any = { productName: 'JAMI' };
   let allTotal = 0;
 
@@ -113,13 +118,7 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
   totalRow.total = allTotal;
   const footer = worksheet.addRow(totalRow);
   footer.font = { bold: true };
-  footer.height = 25;
 
   return await workbook.xlsx.writeBuffer();
 }
-
-
-
-
-
 }
