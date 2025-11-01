@@ -15,3 +15,23 @@ export class CreateOrderDto {
   @IsArray()
   products: ProductItem[];
 }
+
+import { IsOptional, IsString, IsDateString } from 'class-validator';
+
+export class OrderFilterDto {
+  @IsOptional()
+  @IsString()
+  status?: 'new' | 'accepted' | 'delivered';
+
+  @IsOptional()
+  @IsDateString()
+  from?: string; 
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+  
+  @IsOptional()
+  @IsString()
+  marketId? : string
+}
