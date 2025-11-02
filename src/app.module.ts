@@ -33,7 +33,6 @@ dotenv.config()
           }
         }),
      AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule],
-  
   controllers: [],
   providers: [DeliverSeed, DeliverGuard, MarketGuard],
 })
