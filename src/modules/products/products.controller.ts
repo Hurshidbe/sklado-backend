@@ -3,6 +3,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
+import { ApiParam } from '@nestjs/swagger';
 
 @UseGuards(DeliverGuard)
 @Controller('products')
@@ -28,6 +29,10 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690797eefdec07bb92b752e2'
+  })
   async findOne(@Param('id') id: string) {
     try {
       const product = await this.productsService.findOne(id);
@@ -41,6 +46,10 @@ export class ProductsController {
   }
 
   @Patch(':id')
+    @ApiParam({
+    name : 'id',
+    example : '690797eefdec07bb92b752e2'
+  })
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     try {
       const updated = await this.productsService.update(id, updateProductDto);
@@ -54,6 +63,10 @@ export class ProductsController {
   }
 
   @Delete(':id')
+    @ApiParam({
+    name : 'id',
+    example : '690797eefdec07bb92b752e2'
+  })
   async remove(@Param('id') id: string) {
     try {
       const result = await this.productsService.remove(id);

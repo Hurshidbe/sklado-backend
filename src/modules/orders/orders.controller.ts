@@ -7,6 +7,7 @@ import { Order } from './entities/order.entity';
 import { Http2ServerRequest } from 'http2';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import DeliverGuard from 'src/guards/deliverGuard';
+import { ApiParam, ApiProperty } from '@nestjs/swagger';
 
 @UseGuards(MarketGuard)
 @Controller('orders')
@@ -32,6 +33,12 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name : 'id',
+    required : true,
+    description : 'get own order ById',
+    example : '69078be8156fae69f2254ff3'
+  })
   async getById(@Param('id') id : string , @Req() req : any){
     try {
       return await this.ordersService.findOne(id , req.market.id)
