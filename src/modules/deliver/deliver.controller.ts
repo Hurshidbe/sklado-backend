@@ -7,6 +7,7 @@ import { OrdersService } from '../orders/orders.service';
 import DeliverGuard from 'src/guards/deliverGuard';
 import type { Response } from 'express';
 import { OrderFilterDto } from '../orders/dto/create-order.dto';
+import { ApiParam } from '@nestjs/swagger';
 
 @Controller('deliver')
 export class DeliverController {
@@ -16,7 +17,11 @@ export class DeliverController {
   ) {}
 
   @UseGuards(DeliverGuard)
-  @Get('id')
+  @Get('orders/:id')
+  @ApiParam({
+    name : 'id',
+    example : '69064cd9743a3140533cdf2f'
+  })
   async getOrderById(@Param('id') id : string){
     try {
       return await this.deliverService.getOrderById(id)
@@ -37,7 +42,11 @@ export class DeliverController {
   }
 
   @UseGuards(DeliverGuard)
-  @Patch(':id/accept')
+  @Patch(':id/accept-order')
+  @ApiParam({
+    name : 'id',
+    example : '69064cd9743a3140533cdf2f'
+  })
   async acceptOrder(@Param('id') id : string){
     try {
       return await this.orderService.setAccepted(id)
@@ -47,7 +56,11 @@ export class DeliverController {
   }
 
   @UseGuards(DeliverGuard)
-  @Patch(':id/delivered')
+  @Patch(':id/delivered-order')
+  @ApiParam({
+    name : 'id',
+    example : '69064cd9743a3140533cdf2f'
+  })
   async deliveOrder(@Param('id') id : string){
     try {
       return await this.orderService.setDelivered(id)

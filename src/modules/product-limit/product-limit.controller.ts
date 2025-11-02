@@ -4,6 +4,7 @@ import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
 import { Http2ServerRequest } from 'http2';
+import { ApiParam } from '@nestjs/swagger';
 
 @UseGuards(DeliverGuard)
 @Controller('product-limit')
@@ -29,6 +30,10 @@ export class ProductLimitController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690792686619bf16a7be55b3'
+  })
   findOne(@Param('id') id: string) {
     try {
       return this.productLimitService.findOne(id);
@@ -38,6 +43,10 @@ export class ProductLimitController {
   }
 
   @Patch(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690792686619bf16a7be55b3'
+  })
   update(@Param('id') id: string, @Body() updateProductLimitDto: UpdateProductLimitDto) {
     try {
       return this.productLimitService.update(id, updateProductLimitDto);
@@ -47,6 +56,10 @@ export class ProductLimitController {
   }
 
   @Delete(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690792686619bf16a7be55b3'
+  })
   remove(@Param('id') id: string) {
     try {
       return this.productLimitService.remove(id);

@@ -14,6 +14,7 @@ import { MarketsService } from './markets.service';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
 import AuthGuard from 'src/guards/deliverGuard';
+import { ApiParam } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard)
 @Controller('markets')
@@ -39,6 +40,10 @@ export class MarketsController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690648051d2854575b18ff98'
+  })
   async findOne(@Param('id') id: string) {
     try {
       const market = await this.marketsService.findOne(id);
@@ -52,6 +57,10 @@ export class MarketsController {
   }
 
   @Patch(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690648051d2854575b18ff98'
+  })
   async update(@Param('id') id: string, @Body() updateMarketDto: UpdateMarketDto) {
     try {
       const updated = await this.marketsService.update(id, updateMarketDto);
@@ -65,6 +74,10 @@ export class MarketsController {
   }
 
   @Delete(':id')
+  @ApiParam({
+    name : 'id',
+    example : '690648051d2854575b18ff98'
+  })
   async remove(@Param('id') id: string) {
     try {
       const result = await this.marketsService.remove(id);
