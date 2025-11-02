@@ -10,6 +10,7 @@ import { OrdersService } from './orders.service';
 import { ProductLimit, ProductLimitSchema } from '../product-limit/entities/product-limit.entity';
 import { ProductsService } from '../products/products.service';
 import { ProductLimitModule } from '../product-limit/product-limit.module';
+import { MarketsModule } from '../markets/markets.module';
 
 @Module({
   imports : [

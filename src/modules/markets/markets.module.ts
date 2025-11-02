@@ -13,5 +13,6 @@ import { Market, MarketSchema } from './entities/market.entity';
   ],
   controllers: [MarketsController],
   providers: [MarketsService],
+  exports: [MarketsService],
 })
 export class MarketsModule {}

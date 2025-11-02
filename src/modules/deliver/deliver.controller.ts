@@ -30,7 +30,7 @@ export class DeliverController {
   @Get('orders')
   async all(@Query() query : any){
     try {
-      return await this.orderService.findAll(query)        
+      return await this.orderService.find(query)        
     } catch (error) {
       throw new HttpException(error.message , error.status)
     }
@@ -55,14 +55,11 @@ export class DeliverController {
       throw new HttpException(error.message , error.status)
     }
   }
-  
-  // 3) excel integration
-  // @UseGuards(DeliverGuard)
-@Get('export')
-async exportOrders(
+  @UseGuards(DeliverGuard)
+  @Get('export')
+  async exportOrders(
   @Res() res: Response,
-  @Query() filter: OrderFilterDto,
-) {
+  @Query() filter: OrderFilterDto) {
   const date = new Date().toISOString().slice(0, 10);
   const buffer = await this.deliverService.exportOrdersToExcel(filter);
 
@@ -77,8 +74,5 @@ async exportOrders(
 
   res.end(buffer);
 }
-
-
-  // 4) bot link
   // 5) full swagger
 }

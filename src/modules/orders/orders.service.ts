@@ -36,7 +36,7 @@ export class OrdersService {
     return order.save()
     }
 
-  async findAll(filter: { market?: string; status?: string; from?: string; to?: string }) {
+  async find(filter: { market?: string; status?: string; from?: string; to?: string }) {
   const query: any = {};
   if (filter.market) query.marketId = filter.market
   if (filter.status) query.status = filter.status
