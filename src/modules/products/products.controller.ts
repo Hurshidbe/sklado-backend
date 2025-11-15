@@ -3,7 +3,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @UseGuards(DeliverGuard)
 @Controller('products')
@@ -11,6 +11,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @ApiOperation({summary : 'yangi product qo`shish'})
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       return await this.productsService.create(createProductDto);
@@ -20,6 +21,7 @@ export class ProductsController {
   }
 
   @Get()
+  @ApiOperation({summary : 'barcha productlar ro`yhati'})
   async findAll() {
     try {
       return await this.productsService.findAll();
@@ -29,6 +31,7 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @ApiOperation({summary : 'productni ko`rish ById'})
   @ApiParam({
     name : 'id',
     example : '690797eefdec07bb92b752e2'
@@ -46,9 +49,10 @@ export class ProductsController {
   }
 
   @Patch(':id')
-    @ApiParam({
-    name : 'id',
-    example : '690797eefdec07bb92b752e2'
+  @ApiOperation({summary : 'product ni taxrirlash'})
+  @ApiParam({
+  name : 'id',
+  example : '690797eefdec07bb92b752e2'
   })
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     try {
@@ -63,6 +67,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @ApiOperation({summary : 'productni chopish ById'})
     @ApiParam({
     name : 'id',
     example : '690797eefdec07bb92b752e2'

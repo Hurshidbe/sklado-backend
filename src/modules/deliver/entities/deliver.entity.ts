@@ -12,7 +12,7 @@ export class Deliver extends Document {
   @Prop()
   password : string
 
-  @Prop()
+  @Prop({default : 'deliver'})
   role : string
 }
 

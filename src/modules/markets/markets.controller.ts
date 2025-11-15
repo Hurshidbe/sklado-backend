@@ -14,7 +14,7 @@ import { MarketsService } from './markets.service';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
 import AuthGuard from 'src/guards/deliverGuard';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard)
 @Controller('markets')
@@ -22,6 +22,7 @@ export class MarketsController {
   constructor(private readonly marketsService: MarketsService) {}
 
   @Post()
+  @ApiOperation({summary : 'yangi market qo`shish'})
   async create(@Body() createMarketDto: CreateMarketDto) {
     try {
       return await this.marketsService.create(createMarketDto);
@@ -31,6 +32,7 @@ export class MarketsController {
   }
 
   @Get()
+  @ApiOperation({summary : 'barcha marketlar ro`yhati'})
   async findAll() {
     try {
       return await this.marketsService.findAll();
@@ -40,6 +42,7 @@ export class MarketsController {
   }
 
   @Get(':id')
+  @ApiOperation({summary : 'market ById ko`rish'})
   @ApiParam({
     name : 'id',
     example : '690648051d2854575b18ff98'
@@ -57,6 +60,7 @@ export class MarketsController {
   }
 
   @Patch(':id')
+  @ApiOperation({summary : 'market ma`lumotlarini taxrirlash'})
   @ApiParam({
     name : 'id',
     example : '690648051d2854575b18ff98'
@@ -74,6 +78,7 @@ export class MarketsController {
   }
 
   @Delete(':id')
+  @ApiOperation({summary : 'marketni o`chirish ById'})
   @ApiParam({
     name : 'id',
     example : '690648051d2854575b18ff98'

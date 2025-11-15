@@ -4,7 +4,7 @@ import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
 import { Http2ServerRequest } from 'http2';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @UseGuards(DeliverGuard)
 @Controller('product-limit')
@@ -12,6 +12,7 @@ export class ProductLimitController {
   constructor(private readonly productLimitService: ProductLimitService) {}
 
   @Post()
+  @ApiOperation({summary : 'biror product uchun limit qo`yish( ex : 7 kun uchun 70kg )'})
   create(@Body() createProductLimitDto: CreateProductLimitDto) {
     try {
        return this.productLimitService.create(createProductLimitDto);
@@ -21,6 +22,7 @@ export class ProductLimitController {
   }
 
   @Get()
+  @ApiOperation({summary : 'limiti bor barcha maxsulotlarni ko`rish'})
   findAll() {
     try {
       return this.productLimitService.findAll();
@@ -30,6 +32,7 @@ export class ProductLimitController {
   }
 
   @Get(':id')
+  @ApiOperation({summary : "id bo'yicha ko'rish"})
   @ApiParam({
     name : 'id',
     example : '690792686619bf16a7be55b3'
@@ -43,6 +46,7 @@ export class ProductLimitController {
   }
 
   @Patch(':id')
+  @ApiOperation({summary : 'limitni taxrirlash'})
   @ApiParam({
     name : 'id',
     example : '690792686619bf16a7be55b3'
@@ -56,6 +60,7 @@ export class ProductLimitController {
   }
 
   @Delete(':id')
+  @ApiOperation({summary : "limitni o'chirish"})
   @ApiParam({
     name : 'id',
     example : '690792686619bf16a7be55b3'

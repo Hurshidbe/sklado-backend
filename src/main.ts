@@ -10,7 +10,11 @@ dotenv.config()
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser())
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({
+    transform : true,
+    whitelist : true,
+    forbidNonWhitelisted : true
+  }))
   const config = new DocumentBuilder()
   .setTitle('Toycha.uz APIs')
   .setDescription('Toycha.uz loyihasining barcha endpointlari')

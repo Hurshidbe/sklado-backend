@@ -15,6 +15,7 @@ import { MarketsService } from '../markets/markets.service';
   imports : [
      OrdersModule,
      MongooseModule.forFeature([
+       {name : Deliver.name , schema : DeliverSchema},
        {name : Order.name , schema : OrderSchema},
        {name : Market.name , schema : MarketSchema},
        {name : Product.name , schema : ProductSchema}

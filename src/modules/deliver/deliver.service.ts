@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateDeliverDto } from './dto/create-deliver.dto';
 import { UpdateDeliverDto } from './dto/update-deliver.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,11 +6,16 @@ import { Order } from '../orders/entities/order.entity';
 import { Model } from 'mongoose';
 import * as ExcelJS from 'exceljs';
 import { OrderFilterDto } from '../orders/dto/create-order.dto';
+import { transcode } from 'buffer';
+import { Deliver } from './entities/deliver.entity';
 
 
 @Injectable()
 export class DeliverService {
-  constructor(@InjectModel(Order.name) private readonly orderRepo : Model<Order>){}
+  constructor(
+    @InjectModel(Order.name) private readonly orderRepo : Model<Order>,
+    @InjectModel(Deliver.name) private readonly deliverRepo : Model<Deliver>
+){}
 
   async getOrderById(id : string){
     return await this.orderRepo.findById(id)
@@ -120,5 +125,16 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
   footer.font = { bold: true };
 
   return await workbook.xlsx.writeBuffer();
+}
+
+async createDeliver(dto: CreateDeliverDto) {
+  if (dto.password !== dto.return_password) {
+    throw new BadRequestException('Parollar bir xil emas');
+  }
+  return await this.deliverRepo.create({
+    name: dto.name,
+    password: dto.password,
+    phone: dto.phone
+  });
 }
 }

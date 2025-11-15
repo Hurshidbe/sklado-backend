@@ -123,4 +123,12 @@ async limitedCreate(marketId: string) {
   if (orders.length !== 0) throw new BadRequestException('daily order creating limit reached')
   return true
 }
+
+async findoneProduct(id : string){
+  return await this.productRepo.findById(id)
+}
+
+async findAllProducts(){
+  return await this.productRepo.find()
+}
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, HttpException, Query, Res, BadRequestException } from '@nestjs/common';
 import { DeliverService } from './deliver.service';
 import { CreateDeliverDto } from './dto/create-deliver.dto';
 import { UpdateDeliverDto } from './dto/update-deliver.dto';
@@ -7,7 +7,7 @@ import { OrdersService } from '../orders/orders.service';
 import DeliverGuard from 'src/guards/deliverGuard';
 import type { Response } from 'express';
 import { OrderFilterDto } from '../orders/dto/create-order.dto';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @Controller('deliver')
 export class DeliverController {
@@ -18,6 +18,7 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Get('orders/:id')
+  @ApiOperation({summary : 'buyurtmani ko`rish ById'})
   @ApiParam({
     name : 'id',
     example : '69064cd9743a3140533cdf2f'
@@ -33,8 +34,9 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Get('orders')
+  @ApiOperation({summary: `barcha buyurtmalar || query qabul qiladi`, description : 'query elements :(market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)'})
   async all(@Query() query : any){
-    try {
+    try {                                                  /// hurshidbe (utc problem)
       return await this.orderService.find(query)        
     } catch (error) {
       throw new HttpException(error.message , error.status)
@@ -43,6 +45,7 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Patch(':id/accept-order')
+  @ApiOperation({summary : 'buyurtmani qabul qilish'})
   @ApiParam({
     name : 'id',
     example : '69064cd9743a3140533cdf2f'
@@ -57,6 +60,7 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Patch(':id/delivered-order')
+  @ApiOperation({summary : 'buyurtmani qabul qilmaslik'})
   @ApiParam({
     name : 'id',
     example : '69064cd9743a3140533cdf2f'
@@ -70,6 +74,7 @@ export class DeliverController {
   }
   @UseGuards(DeliverGuard)
   @Get('export')
+  @ApiOperation({summary: `barcha buyurtmalarni chop etish (excel shaklida yuklash) || query qabul qiladi`, description : 'query elements :(market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)'})
   async exportOrders(
   @Res() res: Response,
   @Query() filter: OrderFilterDto) {
@@ -87,5 +92,23 @@ export class DeliverController {
 
   res.end(buffer);
 }
-  // 5) full swagger
+
+@Post()
+async createNewDeliver(@Body() dto : CreateDeliverDto){
+  try {
+    return await this.deliverService.createDeliver(dto)
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestException(error.message , error.status)
+  }
+}
+
+@Patch(':id')
+async updateDeliverById(@Param('id') id : string, @Body() dto : UpdateDeliverDto){
+  try {
+    
+  } catch (error) {
+    throw new HttpException(error.message , error.status)
+  }
+}
 }
