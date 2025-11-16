@@ -35,6 +35,33 @@ export class OrdersController {
     }
   }
 
+  @Get('products')
+  @ApiOperation({summary : 'hamma productlarni olish(marketlar uchun)'})
+  async productsList(){
+    try {
+      return await this.ordersService.findAllProducts()
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
+
+
+  @Get('products/:id')
+  @ApiOperation({summary : 'Productni Id bo`yicha olish(marketlar uchun)'})
+  @ApiParam({
+      name : 'id',
+      required : true,
+      description : 'id bo`yicha productni olish',
+      example : '690648a11d2854575b18ffa3'
+    })
+  async productById(@Param('id') id : string){
+    try {
+      return await this.ordersService.findoneProduct(id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
+
   @Get(':id')
   @ApiOperation({summary : 'o`z buyurtmasini ko`rish'})
   @ApiParam({
@@ -85,33 +112,6 @@ async remove(@Param('id') id: string, @Req() req: any) {
     throw new HttpException(error.message, error.status);
   }
 } 
-
-@Get('products')
-@ApiOperation({summary : 'hamma productlarni olish(marketlar uchun)'})
-async productsList(){
-  try {
-    return await this.ordersService.findAllProducts()
-  } catch (error) {
-    throw new HttpException(error.message , error.status)
-  }
-}
-
-
-@Get('products/:id')
-@ApiOperation({summary : 'Productni Id bo`yicha olish(marketlar uchun)'})
-@ApiParam({
-    name : 'id',
-    required : true,
-    description : 'id bo`yicha productni olish',
-    example : '690648a11d2854575b18ffa3'
-  })
-async productById(@Param('id') id : string){
-  try {
-    return await this.ordersService.findoneProduct(id)
-  } catch (error) {
-    throw new HttpException(error.message , error.status)
-  }
-}
 }
 
 

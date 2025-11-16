@@ -129,6 +129,6 @@ async findoneProduct(id : string){
 }
 
 async findAllProducts(){
-  return await this.productRepo.find()
+  return  await this.productRepo.find()
 }
 }
