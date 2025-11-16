@@ -137,4 +137,10 @@ async createDeliver(dto: CreateDeliverDto) {
     phone: dto.phone
   });
 }
+
+async updateDeliver(dto: UpdateDeliverDto, id: string) {
+  if (dto.password !== dto.return_password) throw new BadRequestException('passwordlar bir xil emas')
+  return await this.deliverRepo.findByIdAndUpdate(id, dto, { new: true });
+}
+
 }

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateMarketDto } from './create-market.dto';
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateMarketDto extends PartialType(CreateMarketDto) {
@@ -16,6 +16,12 @@ export class UpdateMarketDto extends PartialType(CreateMarketDto) {
         @IsString()
         @Length(9,9)
         phone? : string
+
+        @ApiProperty({type : String , example : 'A.Navoiy-ko`chasi 34-A uy'})
+        @IsOptional()
+        @IsString()
+        @MaxLength(300)
+        address? : string
     
         @ApiProperty({type : 'string', example : '1111'})
         @IsOptional()

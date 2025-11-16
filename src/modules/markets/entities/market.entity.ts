@@ -9,6 +9,9 @@ export class Market extends Document {
     @Prop({unique :  true})
     phone : string
 
+    @Prop({required: false})
+    address? : string
+
     @Prop()
     password : string
 

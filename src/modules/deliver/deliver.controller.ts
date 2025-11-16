@@ -94,6 +94,7 @@ export class DeliverController {
 }
 
 @Post()
+@ApiOperation({summary : 'yangi deliver qo`shish'})
 async createNewDeliver(@Body() dto : CreateDeliverDto){
   try {
     return await this.deliverService.createDeliver(dto)
@@ -104,9 +105,14 @@ async createNewDeliver(@Body() dto : CreateDeliverDto){
 }
 
 @Patch(':id')
+@ApiOperation({summary : 'deliver ma`lumotlarini taxrirlash'})
+@ApiParam({
+  name : 'id',
+  example : 'deliver_id'
+})
 async updateDeliverById(@Param('id') id : string, @Body() dto : UpdateDeliverDto){
   try {
-    
+    return await this.deliverService.updateDeliver(dto , id)
   } catch (error) {
     throw new HttpException(error.message , error.status)
   }

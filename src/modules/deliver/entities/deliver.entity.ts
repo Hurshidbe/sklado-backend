@@ -6,7 +6,7 @@ export class Deliver extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({unique : true})
   phone: string;
 
   @Prop()
