@@ -42,8 +42,8 @@ async all(
   @Query('status') status?: 'new' | 'accepted' | 'rejected',
   @Query('from') from?: string,
   @Query('to') to?: string,
-  @Query('page') page = '1',
-  @Query('limit') limit ='10',
+  @Query('page') page : string ='1' ,
+  @Query('limit') limit : string ='10'
 
 ) {
   const pageNum = parseInt(page)

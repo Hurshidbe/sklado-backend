@@ -79,9 +79,31 @@ async find(
 }
 
 
-async findAllOwn(marketId : string){
-  return await this.orderRepo.find({marketId})
+async findAllOwn(
+  marketId: string,
+  filter: { status?: 'new' | 'accepted' | 'rejected' },
+  pagination: { pageNum: number; limitNum: number }
+) {
+  const query: any = {};
+  query.marketId = marketId;
+  if (filter.status) query.status = filter.status;
+  const skip = (pagination.pageNum - 1) * pagination.limitNum;
+  const orders = await this.orderRepo
+    .find(query, '-__v')
+    .populate('products.productId', 'name')
+    .skip(skip)
+    .limit(pagination.limitNum)
+    .lean();
+  const total = await this.orderRepo.countDocuments(query);
+
+  return {
+    total,
+    page: pagination.pageNum,
+    limit: pagination.limitNum,
+    data: orders,
+  };
 }
+
 
 async findOne(id: string , marketId : string) {
     await this.isOwnOrder(id , marketId)

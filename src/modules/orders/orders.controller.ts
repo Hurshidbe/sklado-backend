@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Res, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Res, Req, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -27,9 +27,16 @@ export class OrdersController {
 
   @Get()
   @ApiOperation({summary : "o'ziga tegishli barcha buyurtmalarni ko'rish"})
-  async ownOrders(@Req() req : any){
+  async ownOrders(@Req() req : any,
+  @Query('status') status? : 'new'|'accepted'|'rejected',
+  @Query('page') page : string ='1' ,
+  @Query('limit') limit : string ='10'
+){
+  const pageNum = parseInt(page)
+  const limitNum = parseInt(limit)
+  const filter: any ={status}
     try {
-      return await this.ordersService.findAllOwn(req.market.id)
+      return await this.ordersService.findAllOwn(req.market.id, filter, {pageNum, limitNum})
     } catch (error) {
       throw new HttpException(error.message , error.status)
     }
