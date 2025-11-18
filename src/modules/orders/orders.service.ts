@@ -41,25 +41,44 @@ export class OrdersService {
   return order.save();
 }
 
-
-  async find(filter: { market?: string; status?: string; from?: string; to?: string }) {
+async find(
+  filter: { marketId?: string; status?: string; from?: string; to?: string }, pageNum: number, limitNum: number
+) {
   const query: any = {};
-  if (filter.market) query.marketId = filter.market
-  if (filter.status) query.status = filter.status
-  if (filter.from || filter.to) {
-    query.createdAt = {}
-    if (filter.from) query.createdAt.$gte = new Date(filter.from)
-    if (filter.to) query.createdAt.$lte = new Date(filter.to)
-  }
 
+  if (filter.marketId) query.marketId = filter.marketId;
+  if (filter.status) query.status = filter.status;
+
+  if (filter.from || filter.to) {
+    query.updatedAt = {};
+    if (filter.from) query.updatedAt.$gte = new Date(filter.from);
+    if (filter.to) {
+      const toDate = new Date(filter.to);
+      toDate.setHours(23, 59, 59, 999);
+      query.updatedAt.$lte = toDate;
+    }
+  }
+  const skip = (pageNum - 1) * limitNum;
   const orders = await this.orderRepo
     .find(query, '-__v')
     .populate('marketId', 'name phone')
     .populate('products.productId', 'name')
+    .skip(skip)
+    .limit(limitNum)
     .lean();
+
   if (!orders.length) throw new NotFoundException('Orders not found');
-  return orders;
+  const total = await this.orderRepo.countDocuments(query);
+
+  return {
+    total,
+    page: pageNum,
+    limit: limitNum,
+    data: orders,
+  };
 }
+
+
 async findAllOwn(marketId : string){
   return await this.orderRepo.find({marketId})
 }

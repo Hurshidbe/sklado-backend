@@ -32,16 +32,26 @@ export class DeliverController {
   }
 
 
-  @UseGuards(DeliverGuard)
-  @Get('orders')
-  @ApiOperation({summary: `barcha buyurtmalar || query qabul qiladi`, description : 'query elements :(market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)'})
-  async all(@Query() query : any){
-    try {                                                  /// hurshidbe (utc problem)
-      return await this.orderService.find(query)        
-    } catch (error) {
-      throw new HttpException(error.message , error.status)
-    }
-  }
+@UseGuards(DeliverGuard)
+@Get('orders')
+@ApiOperation({
+  summary: `Barcha buyurtmalar || query qabul qiladi`,
+})
+async all(
+  @Query('marketId') marketId?: string,
+  @Query('status') status?: 'new' | 'accepted' | 'rejected',
+  @Query('from') from?: string,
+  @Query('to') to?: string,
+  @Query('page') page = '1',
+  @Query('limit') limit ='10',
+
+) {
+  const pageNum = parseInt(page)
+  const limitNum = parseInt(limit)
+  const filter: any = { marketId, status, from, to };
+  return await this.orderService.find(filter, pageNum, limitNum);
+}
+
 
   @UseGuards(DeliverGuard)
   @Patch(':id/accept-order')
