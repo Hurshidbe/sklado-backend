@@ -13,8 +13,6 @@ class ProductItem {
 }
 
 export class CreateOrderDto {
-  marketId?: string;
-
   @ApiProperty({type : [ProductItem]})
   @IsArray()
   products: ProductItem[];

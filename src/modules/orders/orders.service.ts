@@ -20,21 +20,27 @@ export class OrdersService {
     private readonly productLimitService : ProductLimitService
   ){}
 
-  async create(body: CreateOrderDto , marketId :string) {
-    await this.limitedCreate(marketId)
-    body.marketId =marketId
-    for(const item of body.products){
-      const product = await this.productRepo.findById(item.productId)
-      if(!product) throw new NotFoundException (`Product ${item.productId} not found`)
-        await this.productLimitService.checkProductLimit(
+ async create(body: CreateOrderDto, marketId: string) {
+  await this.limitedCreate(marketId);
+
+  for (const item of body.products) {
+    const product = await this.productRepo.findById(item.productId);
+    if (!product)
+      throw new NotFoundException(`Product ${item.productId} not found`);
+
+    await this.productLimitService.checkProductLimit(
       item.productId.toString(),
       marketId,
       item.quantity,
     );
-    }
-    const order = new this.orderRepo(body);
-    return order.save()
-    }
+  }
+
+  const orderData = { ...body, marketId };
+
+  const order = new this.orderRepo(orderData);
+  return order.save();
+}
+
 
   async find(filter: { market?: string; status?: string; from?: string; to?: string }) {
   const query: any = {};
@@ -129,6 +135,6 @@ async findoneProduct(id : string){
 }
 
 async findAllProducts(){
-  return  await this.productRepo.find()
+  return await this.productRepo.find()
 }
 }
