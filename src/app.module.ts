@@ -13,14 +13,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductLimitModule } from './modules/product-limit/product-limit.module';
 import DeliverGuard from './guards/deliverGuard';
 import MarketGuard from './guards/marketGuard';
+import { DocumentBuilder } from '@nestjs/swagger';
+import { ContactModule } from './modules/contact/contact.module';
 dotenv.config()
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.DB||""),DeliverModule,
+  imports: [
+     MongooseModule.forRoot(process.env.DB||""),DeliverModule,
      MongooseModule.forFeature([
           {name : Deliver.name, schema : DeliverSchema}
         ]),
-
         JwtModule.registerAsync({
           global : true,
           imports : [ConfigModule],
@@ -32,7 +34,7 @@ dotenv.config()
             }
           }
         }),
-     AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule],
+     AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule, ContactModule],
   controllers: [],
   providers: [DeliverSeed, DeliverGuard, MarketGuard],
 })

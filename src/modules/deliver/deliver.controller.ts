@@ -5,15 +5,19 @@ import { UpdateDeliverDto } from './dto/update-deliver.dto';
 import MarketGuard from 'src/guards/marketGuard';
 import { OrdersService } from '../orders/orders.service';
 import DeliverGuard from 'src/guards/deliverGuard';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { OrderFilterDto } from '../orders/dto/create-order.dto';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ContactService } from '../contact/contact.service';
+import { message } from 'telegraf/filters';
+import { MessageDto } from '../contact/dto/create-contact.dto';
 
 @Controller('deliver')
 export class DeliverController {
   constructor(
     private readonly deliverService: DeliverService,
-    private readonly orderService : OrdersService
+    private readonly orderService : OrdersService,
+    private readonly contanctService : ContactService
   ) {}
 
   @UseGuards(DeliverGuard)
@@ -125,6 +129,40 @@ async updateDeliverById(@Param('id') id : string, @Body() dto : UpdateDeliverDto
     return await this.deliverService.updateDeliver(dto , id)
   } catch (error) {
     throw new HttpException(error.message , error.status)
+  }
+}
+
+@Get('chat/:id')
+@ApiOperation({summary : 'marketfa tegishli chatni olib kelish'})
+@ApiParam({
+  name :'id',
+  type : String,
+  description : 'marketId',
+  example : '6904da8156c4cca9dbccf758'
+})
+async MarketChat(
+  @Param('id') marketId : string
+){
+  try {
+    return await this.contanctService.findMarketChat(marketId)
+  } catch (error) {
+    console.log(error)
+    throw new HttpException(error.meesage , error.status)
+  }
+}
+
+@UseGuards(DeliverGuard)
+@Post('send-message/:id')
+@ApiOperation({summary : 'marketlarga marketId si orqali  message yuborish'})
+async send(
+  @Req() req : any,
+  @Param('id') id : string,
+  @Body() message : MessageDto
+){
+  try {
+    return await this.contanctService.sendMessageToMarket(req.user.id , id, message )
+  } catch (error) {
+    throw new HttpException(error.message , error.status||500)
   }
 }
 }

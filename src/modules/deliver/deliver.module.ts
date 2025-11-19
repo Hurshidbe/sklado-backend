@@ -10,6 +10,8 @@ import { Market, MarketSchema } from '../markets/entities/market.entity';
 import { Product, ProductSchema } from '../products/entities/product.entity';
 import { OrdersService } from '../orders/orders.service';
 import { MarketsService } from '../markets/markets.service';
+import { Contact, ContactSchema } from '../contact/entities/contact.entity';
+import { ContactService } from '../contact/contact.service';
 
 @Module({
   imports : [
@@ -18,10 +20,11 @@ import { MarketsService } from '../markets/markets.service';
        {name : Deliver.name , schema : DeliverSchema},
        {name : Order.name , schema : OrderSchema},
        {name : Market.name , schema : MarketSchema},
-       {name : Product.name , schema : ProductSchema}
+       {name : Product.name , schema : ProductSchema},
+       {name : Contact.name, schema : ContactSchema}
      ])
    ],
   controllers: [DeliverController],
-  providers: [DeliverService, MarketsService],
+  providers: [DeliverService, MarketsService, ContactService],
 })
 export class DeliverModule {}
