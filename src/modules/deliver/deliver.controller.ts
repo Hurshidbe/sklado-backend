@@ -155,14 +155,24 @@ async MarketChat(
 @Post('send-message/:id')
 @ApiOperation({summary : 'marketlarga marketId si orqali  message yuborish'})
 async send(
-  @Req() req : any,
   @Param('id') id : string,
   @Body() message : MessageDto
 ){
   try {
-    return await this.contanctService.sendMessageToMarket(req.user.id , id, message )
+    return await this.contanctService.sendMessageToMarket( id, message )
   } catch (error) {
     throw new HttpException(error.message , error.status||500)
+  }
+}
+
+@UseGuards(DeliverGuard)
+@Get('messages')
+@ApiOperation({summary : 'hamma messagelarni olib keladi'})
+async allMessages(){
+  try {
+    return await this.contanctService.findAll()
+  } catch (error) {
+    throw new HttpException(error.meesage , error.status)
   }
 }
 }

@@ -14,8 +14,8 @@ export class ContactService {
   return await this.ContactRepo.create({from, message : body.message})
  }
 
-async sendMessageToMarket(from: string, to: string, messageDto: MessageDto) {
-  return this.ContactRepo.create({from , to , message: messageDto.message });
+async sendMessageToMarket(to: string, messageDto: MessageDto) {
+  return this.ContactRepo.create({from :'deliver', to , message: messageDto.message });
 }
 
 
@@ -31,5 +31,8 @@ async sendMessageToMarket(from: string, to: string, messageDto: MessageDto) {
     if(!marketId) throw new BadRequestException('market not found')
         await this.ContactRepo.updateMany({from : marketId, status : 'new'}, {$set : {status :'viewed'}})
     return await this.ContactRepo.find({$or :[{from : marketId}, {to : marketId}]})
+ }
+ async findAll(){
+   return await this.ContactRepo.find()
  }
 }
