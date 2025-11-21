@@ -178,4 +178,8 @@ async findoneProduct(id : string){
 async findAllProducts(){
   return await this.productRepo.find()
 }
+
+async findOwnProfile(markedId : string){
+  return await this.marketRepo.findById(markedId).select('-password')
+}
 }

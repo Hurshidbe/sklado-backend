@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
-  app.useGlobalPipes(
+   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
@@ -33,6 +33,6 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   console.warn(`Server is running on port ${process.env.PORT ?? 3000}`);
+  console.warn(`for swagger : http://127.0.0.1:${process.env.PORT ?? 3000}/apis`)
 }
-
 bootstrap();
