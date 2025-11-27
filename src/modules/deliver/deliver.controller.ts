@@ -89,6 +89,11 @@ async all(
 
   @UseGuards(DeliverGuard)
   @Patch(':id/reject-order')
+   @ApiOperation({summary : 'buyurtmani reject qilish(qabul qilmaslik)'})
+  @ApiParam({
+    name : 'id',
+    example : '69064cd9743a3140533cdf2f'
+  })
   async reject(@Param('id') id : string){
     try {
       return await this.orderService.setRejected(id)
