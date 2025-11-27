@@ -13,7 +13,7 @@ export class ProductsService {
   }
 
   async findAll() {
-    return await this.ProductRepo.find();
+    return await this.ProductRepo.find().sort({createdAt : -1});
   }
 
   async findOne(id: string) {

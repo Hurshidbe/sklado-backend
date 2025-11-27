@@ -37,9 +37,10 @@ export class DeliverController {
 
   @UseGuards(DeliverGuard)
   @Get('own-profile')
+  @ApiOperation({summary : 'deliver view profile'})
   async getOwnProfile(@Req() req : any){
     try {
-      return await this.deliverService.getOwnProfile(req.deliver.id)
+      return await this.deliverService.getOwnProfile(req.user.id)
     } catch (error) {
       throw new HttpException(error.message , error.status)
     }
@@ -155,6 +156,35 @@ async createNewDeliver(@Body() dto : CreateDeliverDto){
 async updateDeliverById(@Param('id') id : string, @Body() dto : UpdateDeliverDto){
   try {
     return await this.deliverService.updateDeliver(dto , id)
+  } catch (error) {
+    throw new HttpException(error.message , error.status)
+  }
+}
+
+@UseGuards(DeliverGuard)
+@Get('all-delivers')
+@ApiOperation({summary : 'hamma deliverlarni ko`rish'})
+async allDelivers(){
+  try {
+    return await this.deliverService.allDelivers()
+  } catch (error) {
+    throw new HttpException(error.meesage , error.status ||500)
+  }
+}
+
+@UseGuards(DeliverGuard)
+@Get(':id/deliver')
+@ApiOperation({summary : 'deliverni idsi bo`yicha olish'})
+@ApiParam({
+  name : 'id',
+  type : String,
+  required : true
+})
+async getOneDeliver(
+  @Param('id') id : string
+){
+  try {
+    return await this.deliverService.deliversById(id)
   } catch (error) {
     throw new HttpException(error.message , error.status)
   }

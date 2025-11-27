@@ -137,4 +137,10 @@ async updateDeliver(dto: UpdateDeliverDto, id: string) {
   return await this.deliverRepo.findByIdAndUpdate(id, dto, { new: true });
 }
 
+async allDelivers(){
+  return await this.deliverRepo.find().select('-password')
+}
+async deliversById(id  :string){
+  return await this.deliverRepo.findById(id).select('-password')
+}
 }
