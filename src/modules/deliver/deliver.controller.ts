@@ -35,6 +35,16 @@ export class DeliverController {
     }
   }
 
+  @UseGuards(DeliverGuard)
+  @Get('own-profile')
+  async getOwnProfile(@Req() req : any){
+    try {
+      return await this.deliverService.getOwnProfile(req.deliver.id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status)
+    }
+  }
+
 
 @UseGuards(DeliverGuard)
 @Get('orders')

@@ -20,7 +20,7 @@ import { MarketsModule } from '../markets/markets.module';
       {name : Market.name , schema : MarketSchema},
       {name : Product.name , schema : ProductSchema},
       {name : ProductLimit.name , schema : ProductLimitSchema}
-    ])
+    ]),
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

@@ -20,22 +20,14 @@ export class DeliverService {
   async getOrderById(id : string){
     return await this.orderRepo.findById(id)
   }
-
-// Service faylidagi to'g'rilangan funksiya
-
 async exportOrdersToExcel(filter: OrderFilterDto) {
-  // ✅ Query tip bilan xavfsiz qilindi
   const query: Record<string, any> = {};
-
-  // ✅ Market bo‘yicha faqat o‘z orderlarini olish
   if (filter.marketId) {
     query.marketId = filter.marketId;
   }
-
   if (filter.status) {
     query.status = filter.status;
   }
-
   if (filter.from && filter.to) {
     query.createdAt = {
       $gte: new Date(filter.from),
@@ -43,9 +35,9 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
     };
   }
 
-  // ✅ Ma’lumotlarni olish
   const orders = await this.orderRepo
     .find(query)
+    .sort({createdAt : -1})
     .populate('products.productId')
     .populate('marketId')
     .lean();
@@ -126,7 +118,9 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
 
   return await workbook.xlsx.writeBuffer();
 }
-
+async getOwnProfile(id : string){
+  return await this.deliverRepo.findById(id).select('-password')
+}
 async createDeliver(dto: CreateDeliverDto) {
   if (dto.password !== dto.return_password) {
     throw new BadRequestException('Parollar bir xil emas');

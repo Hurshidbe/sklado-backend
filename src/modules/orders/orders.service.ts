@@ -10,7 +10,7 @@ import { Http2ServerRequest } from 'http2';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { error } from 'console';
 import { ProductLimitService } from '../product-limit/product-limit.service';
-
+import { Types } from 'mongoose';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -42,13 +42,20 @@ export class OrdersService {
 }
 
 async find(
-  filter: { marketId?: string; status?: string; from?: string; to?: string }, pageNum: number, limitNum: number
+  filter: { marketId?: string; status?: string; from?: string; to?: string },
+  pageNum: number,
+  limitNum: number
 ) {
   const query: any = {};
+  if (filter.marketId) {
+    try {
+      query.marketId = new Types.ObjectId(filter.marketId);
+    } catch (error) {
+      throw new BadRequestException('Invalid marketId format');
+    }
+  }
 
-  if (filter.marketId) query.marketId = filter.marketId;
   if (filter.status) query.status = filter.status;
-
   if (filter.from || filter.to) {
     query.updatedAt = {};
     if (filter.from) query.updatedAt.$gte = new Date(filter.from);
@@ -58,16 +65,26 @@ async find(
       query.updatedAt.$lte = toDate;
     }
   }
+
   const skip = (pageNum - 1) * limitNum;
   const orders = await this.orderRepo
     .find(query, '-__v')
+    .sort({ createdAt: -1 })
     .populate('marketId', 'name phone')
     .populate('products.productId', 'name')
     .skip(skip)
     .limit(limitNum)
     .lean();
 
-  if (!orders.length) throw new NotFoundException('Orders not found');
+  if (!orders.length) {
+    return {
+      total: 0,
+      page: pageNum,
+      limit: limitNum,
+      data: [],
+    };
+  }
+
   const total = await this.orderRepo.countDocuments(query);
 
   return {
@@ -77,6 +94,7 @@ async find(
     data: orders,
   };
 }
+
 
 
 async findAllOwn(
@@ -90,6 +108,7 @@ async findAllOwn(
   const skip = (pagination.pageNum - 1) * pagination.limitNum;
   const orders = await this.orderRepo
     .find(query, '-__v')
+    .sort({createdAt : -1})
     .populate('products.productId', 'name')
     .skip(skip)
     .limit(pagination.limitNum)
@@ -147,6 +166,9 @@ async setRejected(id : string){
   return await this.orderRepo.findByIdAndUpdate(id , {status : 'rejected'}, {new : true})
 }
 
+async removeMarketAllOrders(id: string){
+  return await this.orderRepo.deleteMany({marketId : id})
+}
 
 async remove(orderId: string, marketId: string) {
   await this.isOwnOrder(orderId, marketId);
@@ -181,7 +203,7 @@ async findoneProduct(id : string){
 }
 
 async findAllProducts(){
-  return await this.productRepo.find()
+  return await this.productRepo.find().sort({createdAt : -1})
 }
 
 async findOwnProfile(markedId : string){
