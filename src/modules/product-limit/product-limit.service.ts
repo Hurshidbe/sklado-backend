@@ -3,7 +3,7 @@ import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductLimit } from './entities/product-limit.entity';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Order } from '../orders/entities/order.entity';
 import { Product } from '../products/entities/product.entity';
 
@@ -16,11 +16,17 @@ export class ProductLimitService {
   ){}
 
   async create(createProductLimitDto: CreateProductLimitDto) {
-    return await this.LimitsRepo.create(createProductLimitDto);
+    if(!createProductLimitDto.marketId||!createProductLimitDto.productId) throw new BadRequestException('market or product not defined')
+    const limit = await this.LimitsRepo.find({productId: createProductLimitDto.productId, marketId : createProductLimitDto.marketId})
+    if(limit.length) throw new BadRequestException('limit already exist for this product on this market, you can edit it')
+    return await this.LimitsRepo.create({...createProductLimitDto, createdAt : this.getUzbTime(), updatedAt: this.getUzbTime()});
   }
 
-  async findAll() {
-    return await this.LimitsRepo.find();
+  async findAll(filter : {marketId? : string, productId? : string}) {
+    const query : any ={}
+    if(filter.productId?.length) query.productId = new mongoose.Types.ObjectId(filter.productId)
+    if(filter.marketId?.length) query.marketId = new mongoose.Types.ObjectId(filter.marketId)
+    return await this.LimitsRepo.find(query).sort({createdAt: -1}).lean();
   }
 
   async findOne(id: string) {
@@ -85,6 +91,9 @@ export class ProductLimitService {
     );
 }
 
-
+getUzbTime() {
+  const nowUTC = new Date();
+  return new Date(nowUTC.getTime() + 5 * 60 * 60 * 1000);
+}
 
 }

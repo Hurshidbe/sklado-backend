@@ -143,6 +143,11 @@ async setDelivered(orderId : string){
   return await this.orderRepo.findByIdAndUpdate(orderId , {status : 'delivered'}, {new : true})
 } 
 
+async setRejected(id : string){
+  return await this.orderRepo.findByIdAndUpdate(id , {status : 'rejected'}, {new : true})
+}
+
+
 async remove(orderId: string, marketId: string) {
   await this.isOwnOrder(orderId, marketId);
   const order = await this.orderRepo.findById(orderId);

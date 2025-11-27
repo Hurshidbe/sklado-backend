@@ -1,31 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Query,} from '@nestjs/common';
 import { ProductLimitService } from './product-limit.service';
 import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
-import { Http2ServerRequest } from 'http2';
-import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 @UseGuards(DeliverGuard)
 @Controller('product-limit')
 export class ProductLimitController {
   constructor(private readonly productLimitService: ProductLimitService) {}
 
-  @Post()
-  @ApiOperation({summary : 'biror product uchun limit qo`yish( ex : 7 kun uchun 70kg )'})
-  create(@Body() createProductLimitDto: CreateProductLimitDto) {
-    try {
-       return this.productLimitService.create(createProductLimitDto);
-    } catch (error) {
-       throw new HttpException(error.message , error.status)      
-    }
+@Post(':marketId/:productId')
+@ApiOperation({ summary: 'biror product uchun limit qo`yish (ex: 7 kun uchun 70kg )' })
+@ApiParam({
+  name: 'marketId',
+  example: '6904da8156c4cca9dbccf758',
+  type: String,
+})
+@ApiParam({
+  name: 'productId',
+  example: '690648a11d2854575b18ffa3',
+  type: String,
+})
+create(
+  @Body() createProductLimitDto: CreateProductLimitDto,
+  @Param('marketId') marketId: string,
+  @Param('productId') productId: string
+) {
+  try {
+    createProductLimitDto.marketId = new Types.ObjectId(marketId);
+    createProductLimitDto.productId = new Types.ObjectId(productId);
+
+    return this.productLimitService.create(createProductLimitDto);
+  } catch (error) {
+    throw new HttpException(error.message, error.status || 500);
   }
+}
 
   @Get()
-  @ApiOperation({summary : 'limiti bor barcha maxsulotlarni ko`rish'})
-  findAll() {
+  @ApiOperation({summary : 'limiti bor barcha maxsulotlarni ko`rish || query qabul qiladi'})
+  findAll(
+    @Query('marketId') marketId? : string,
+    @Query('productId') productId? : string
+  ) {
     try {
-      return this.productLimitService.findAll();
+      const filter : any ={marketId , productId}
+      return this.productLimitService.findAll(filter);
     } catch (error) {
       throw new HttpException(error.message, error.status)
     }
@@ -49,7 +70,7 @@ export class ProductLimitController {
   @ApiOperation({summary : 'limitni taxrirlash'})
   @ApiParam({
     name : 'id',
-    example : '690792686619bf16a7be55b3'
+    example : '6925c89b2c43bfb902117777'
   })
   update(@Param('id') id: string, @Body() updateProductLimitDto: UpdateProductLimitDto) {
     try {

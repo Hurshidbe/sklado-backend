@@ -74,7 +74,7 @@ async all(
 
   @UseGuards(DeliverGuard)
   @Patch(':id/delivered-order')
-  @ApiOperation({summary : 'buyurtmani qabul qilmaslik'})
+  @ApiOperation({summary : 'buyurtma yetkazib berildi.'})
   @ApiParam({
     name : 'id',
     example : '69064cd9743a3140533cdf2f'
@@ -86,6 +86,19 @@ async all(
       throw new HttpException(error.message , error.status)
     }
   }
+
+  @UseGuards(DeliverGuard)
+  @Patch(':id/reject-order')
+  async reject(@Param('id') id : string){
+    try {
+      return await this.orderService.setRejected(id)
+    } catch (error) {
+      throw new HttpException(error.message , error.status ||500)
+    }
+  }
+
+
+
   @UseGuards(DeliverGuard)
   @Get('export')
   @ApiOperation({summary: `barcha buyurtmalarni chop etish (excel shaklida yuklash) || query qabul qiladi`, description : 'query elements :(market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)'})

@@ -1,13 +1,17 @@
+import { Type } from "@nestjs/common";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsMongoId, isMongoId, IsNotEmpty } from "class-validator";
+import { IsMongoId, isMongoId, IsNotEmpty, IsOptional } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateProductLimitDto {
 
-    @ApiProperty({type : 'string' , example :'690648ec1d2854575b18ffb1'})
+    @IsOptional()
     @IsMongoId()
-    @IsNotEmpty()
-    productId : Types.ObjectId
+    marketId? : Types.ObjectId
+
+    @IsOptional()
+    @IsMongoId()
+    productId? : Types.ObjectId
 
     @ApiProperty({type : 'number' , example : 200})
     @IsNotEmpty()
