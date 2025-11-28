@@ -5,13 +5,14 @@ import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { UpdateMarketDto } from '../markets/dto/update-market.dto';
 
 @UseGuards(DeliverGuard)
 @Controller('product-limit')
 export class ProductLimitController {
   constructor(private readonly productLimitService: ProductLimitService) {}
 
-@Post(':marketId/:productId')
+@Post(':marketId/:productId')                                                          //  worked
 @ApiOperation({ summary: 'biror product uchun limit qo`yish (ex: 7 kun uchun 70kg )' })
 @ApiParam({
   name: 'marketId',
@@ -39,7 +40,7 @@ create(
 }
 
   @Get()
-  @ApiOperation({summary : 'limiti bor barcha maxsulotlarni ko`rish || query qabul qiladi'})
+  @ApiOperation({summary : 'limiti bor barcha maxsulotlarni ko`rish || query qabul qiladi'})       // worked
   findAll(
     @Query('marketId') marketId? : string,
     @Query('productId') productId? : string
@@ -53,7 +54,7 @@ create(
   }
 
   @Get(':id')
-  @ApiOperation({summary : "id bo'yicha ko'rish"})
+  @ApiOperation({summary : "id bo'yicha limitlarni ko'rish"})                                                // worked
   @ApiParam({
     name : 'id',
     example : '690792686619bf16a7be55b3'
@@ -67,12 +68,16 @@ create(
   }
 
   @Patch(':id')
-  @ApiOperation({summary : 'limitni taxrirlash'})
+  @ApiOperation({summary : 'limitni taxrirlash'})                                                 // worked
   @ApiParam({
     name : 'id',
-    example : '6925c89b2c43bfb902117777'
+    example : '6904da8156c4cca9dbccf758',
+    description : 'uptade by limit id',
+    required : true
   })
-  update(@Param('id') id: string, @Body() updateProductLimitDto: UpdateProductLimitDto) {
+  update(
+    @Param('id') id : string,
+    @Body() updateProductLimitDto: UpdateProductLimitDto) {
     try {
       return this.productLimitService.update(id, updateProductLimitDto);
     } catch (error) {
@@ -80,11 +85,11 @@ create(
     }
   }
 
-  @Delete(':id')
+  @Delete(':id')                                            // worked
   @ApiOperation({summary : "limitni o'chirish"})
   @ApiParam({
     name : 'id',
-    example : '690792686619bf16a7be55b3'
+    example : '6925e3dcb832d53d106b2f21'
   })
   remove(@Param('id') id: string) {
     try {

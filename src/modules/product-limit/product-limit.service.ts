@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductLimit } from './entities/product-limit.entity';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Order } from '../orders/entities/order.entity';
 import { Product } from '../products/entities/product.entity';
+import { error } from 'console';
 
 @Injectable()
 export class ProductLimitService {
@@ -33,8 +34,8 @@ export class ProductLimitService {
     return await  this.LimitsRepo.findById(id);
   }
 
-  async update(id: string, updateProductLimitDto: UpdateProductLimitDto) {
-    return await this.LimitsRepo.findByIdAndUpdate(id , {...updateProductLimitDto}, {new : true});
+  async update(id : string , updateProductLimitDto: UpdateProductLimitDto) {
+    return await this.LimitsRepo.findByIdAndUpdate(id , {...updateProductLimitDto},  {new : true})
   }
 
   async remove(id: string) {
@@ -42,25 +43,29 @@ export class ProductLimitService {
   }
 
  async checkProductLimit(productId: string, marketId: string, amount: number) {
-  // 1️⃣ Limitni bazadan topamiz
-  const limit = await this.LimitsRepo.findOne({ productId });
-  if (!limit) return; // agar limit mavjud bo‘lmasa — cheklov yo‘q
+  // 🔹 ObjectId sifatida ishlash uchun
+  const productObjId = new Types.ObjectId(productId);
+  const marketObjId = new Types.ObjectId(marketId);
+
+  // 1️⃣ Limitni topamiz (har bir do'kon uchun alohida)
+  const limit = await this.LimitsRepo.findOne({ productId: productObjId, marketId: marketObjId });
+  if (!limit) return; // limit yo'q bo'lsa — cheklov yo'q
 
   // 2️⃣ Limitning tugash vaqtini hisoblaymiz
   const endDate = new Date(limit.startDate);
   endDate.setDate(endDate.getDate() + limit.days);
 
-  // 3️⃣ Agar limit muddati tugagan bo‘lsa — avtomatik yangi davr boshlaymiz
+  // 3️⃣ Agar limit muddati tugagan bo'lsa — yangi davr boshlaymiz
   if (new Date() > endDate) {
     limit.startDate = new Date(); // hozirgi sanadan yangilaymiz
     await limit.save();
     return; // yangi limit davri boshlandi
   }
 
-  // 4️⃣ Shu oraliqda berilgan orderlarni topamiz
+  // 4️⃣ Shu do'kondagi buyurtmalarni topamiz
   const orders = await this.OrderRepo.find({
-    marketId,
-    'products.productId': productId,
+    marketId: marketObjId,
+    'products.productId': productObjId,
     createdAt: { $gte: limit.startDate, $lte: endDate },
   });
 
@@ -73,11 +78,11 @@ export class ProductLimitService {
     if (productItem) totalOrdered += productItem.quantity;
   }
 
-  // 6️⃣ Qancha miqdor qoldi — shuni aniqlaymiz
+  // 6️⃣ Qancha miqdor qoldi
   const remaining = limit.amount - totalOrdered;
 
-  // 🔍 Mahsulot nomini olish (xabar uchun)
-  const product = await this.ProductRepo.findById(productId);
+  // 🔍 Mahsulot nomi (xabar uchun)
+  const product = await this.ProductRepo.findById(productObjId);
 
   // 7️⃣ Tekshiruvlar
   if (remaining <= 0)
@@ -90,6 +95,7 @@ export class ProductLimitService {
       `${product?.name || 'Nomaʼlum mahsulot'} uchun faqat ${remaining} birlik zakaz bera olasiz.`,
     );
 }
+
 
 getUzbTime() {
   const nowUTC = new Date();
