@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, Res, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException,  UseGuards, Req, Res } from '@nestjs/common';
+import type { Response} from 'express'
 import { AuthService } from './auth.service';
 import { LoginDeliverDto, LoginMarketDto } from './dto/create-auth.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
@@ -11,26 +12,43 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('deliver-login')
-  async loginDdeliver(@Body() LoginDeliverDto: LoginDeliverDto, @Res() res : any) {
-    try {
-      const {token , message} = await this.authService.DElogin(LoginDeliverDto)
-      res.cookie('AuthToken', token ,{httponly : true})
-      return res.send(message)
-    } catch (error) {
-      throw new HttpException(error.message ,error.status)
-    }
+async loginDdeliver(
+  @Body() dto: LoginDeliverDto,
+  @Res({ passthrough: true }) res: Response,
+) {
+  try {
+    const { token, message } = await this.authService.DElogin(dto);
+
+    res.cookie('AuthToken', token, {
+      httpOnly: true,
+      secure: false,             
+      maxAge: 20 * 1000,
+    });
+
+    return { message };
+  } catch (error) {
+    throw new HttpException(error.message, error.status || 500);
   }
+}
 
   @Post('market-login')
-  async loginMarket(@Body() LoginMarketDto : LoginMarketDto, @Res() res : any){
-     try {
-      const {token, message} = await this.authService.MAlogin(LoginMarketDto)
-      res.cookie('AuthToken', token , {httponly : true})
-      return res.send(message)
-     } catch (error) {
-      throw new HttpException(error.message , error.status)
-     }
+  async loginMarket( @Body() dto: LoginMarketDto,
+  @Res({ passthrough: true }) res: Response,
+) {
+  try {
+    const { token, message } = await this.authService.MAlogin(dto);
+
+    res.cookie('AuthToken', token, {
+      httpOnly: true,
+      secure: false,             
+      maxAge: 20 * 1000,
+    });
+
+    return { message };
+  } catch (error) {
+    throw new HttpException(error.message, error.status || 500);
   }
+}
   @Delete('deliver-logout')
   @UseGuards(DeliverGuard)
      async logoutDeliver(@Res() res: any) {
@@ -41,7 +59,7 @@ export class AuthController {
   @Delete('market-logout')
   @UseGuards(MarketGuard)
      async logoutMarket(@Res() res: any) {
-     res.clearCookie('AuthToken')
+     res.clearCookie('AuthToken',)
      return res.send('market logout success')
 }
 
