@@ -21,7 +21,7 @@ export class OrdersService {
   ){}
 
  async create(body: CreateOrderDto, marketId: string) {
-  await this.limitedCreate(marketId);
+  // await this.limitedCreate(marketId);
 
   for (const item of body.products) {
     const product = await this.productRepo.findById(item.productId);
@@ -131,28 +131,52 @@ async findOne(id: string , marketId : string) {
 
 async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   await this.isOwnOrder(orderId, marketId);
+
   const order = await this.orderRepo.findById(orderId);
   if (!order) throw new NotFoundException('Order not found');
-  if (order.status !== 'new')
-    throw new BadRequestException(`your order already ${order.status}. you can not edit it`);
 
+  if (order.status !== 'new') {
+    throw new BadRequestException(
+      `your order already ${order.status}. you can not edit it`,
+    );
+  }
   for (const item of updateData.products) {
     const product = await this.productRepo.findById(item.productId);
-    if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
+    if (!product)
+      throw new NotFoundException(`Product ${item.productId} not found`);
+
     await this.productLimitService.checkProductLimit(
       item.productId.toString(),
       marketId,
       item.quantity,
     );
   }
-  order.products = updateData.products.map(item => ({
-    productId: item.productId,
-    quantity: item.quantity,
-  })) as any;
+  const mergedProducts = this.mergeProducts(updateData.products);
+  order.products = mergedProducts as any;
 
   await order.save();
   return order;
 }
+
+private mergeProducts(products: { productId: any; quantity: number }[]) {
+  const map = new Map<string, { productId: any; quantity: number }>();
+
+  for (const item of products) {
+    const id = item.productId.toString();
+
+    if (!map.has(id)) {
+      map.set(id, { productId: item.productId, quantity: item.quantity });
+    } else {
+      const existing = map.get(id)!; 
+      existing.quantity += item.quantity;
+      map.set(id, existing);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+
 
 async setAccepted(orderId : string){
   return await this.orderRepo.findByIdAndUpdate(orderId , {status : 'accepted'}, {new : true})
