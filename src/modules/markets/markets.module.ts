@@ -12,7 +12,6 @@ import { Order, OrderSchema } from '../orders/entities/order.entity';
   imports :[
     MongooseModule.forFeature([
       {name : Market.name , schema : MarketSchema},
-      
     ]),
     OrdersModule
   ],
