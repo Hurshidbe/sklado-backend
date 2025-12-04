@@ -21,24 +21,23 @@ export class CreateOrderDto {
 import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class OrderFilterDto {
-  @ApiProperty({type : 'string' , enum : ['new', 'accepted' , 'rejected', 'delivered'], default : '', required : false})
+  @ApiProperty({ type: String, enum: ['new', 'accepted', 'rejected', 'delivered'], required: false })
   @IsOptional()
   @IsString()
-  status?: 'new' | 'accepted' | 'delivered' |'rejected';
+  status?: 'new' | 'accepted' | 'rejected' | 'delivered';
 
-  @ApiProperty({type : Date.toString , default :'', required : false})
+  @ApiProperty({ type: String, format: 'date-time', required: false })
   @IsOptional()
   @IsDateString()
-  from?: string; 
+  from?: string;
 
-  @ApiProperty({type : Date.toString , default :'', required : false
-  })
+  @ApiProperty({ type: String, format: 'date-time', required: false })
   @IsOptional()
   @IsDateString()
   to?: string;
-  
-  @ApiProperty({type : 'string' , default :'', required : false})
+
+  @ApiProperty({ type: String, required: false })
   @IsOptional()
   @IsString()
-  marketId? : string
+  marketId?: string;
 }

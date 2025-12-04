@@ -21,7 +21,7 @@ export class OrdersService {
   ){}
 
  async create(body: CreateOrderDto, marketId: string) {
-  // await this.limitedCreate(marketId);
+  await this.limitedCreate(marketId);
 
   for (const item of body.products) {
     const product = await this.productRepo.findById(item.productId);
@@ -57,14 +57,10 @@ async find(
 
   if (filter.status) query.status = filter.status;
   if (filter.from || filter.to) {
-    query.updatedAt = {};
-    if (filter.from) query.updatedAt.$gte = new Date(filter.from);
-    if (filter.to) {
-      const toDate = new Date(filter.to);
-      toDate.setHours(23, 59, 59, 999);
-      query.updatedAt.$lte = toDate;
-    }
-  }
+  query.createdAt = {};
+  if (filter.from) query.createdAt.$gte = new Date(filter.from);
+  if (filter.to)query.createdAt.$lte = new Date(filter.to); 
+}
 
   const skip = (pageNum - 1) * limitNum;
   const orders = await this.orderRepo
@@ -99,7 +95,7 @@ async find(
 
 async findAllOwn(
   marketId: string,
-  filter: { status?: 'new' | 'accepted' | 'rejected' },
+  filter: { status?: 'new' | 'accepted' | 'rejected' | 'delivered' },
   pagination: { pageNum: number; limitNum: number }
 ) {
   const query: any = {};

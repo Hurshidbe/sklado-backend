@@ -116,25 +116,32 @@ async all(
 
 
   @UseGuards(DeliverGuard)
-  @Get('export')
-  @ApiOperation({summary: `barcha buyurtmalarni chop etish (excel shaklida yuklash) || query qabul qiladi`, description : 'query elements :(market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)'})
-  async exportOrders(
+@Get('export')
+@ApiOperation({
+  summary: `Barcha buyurtmalarni chop etish (Excel shaklida yuklash) || query qabul qiladi`,
+  description: 'query elements: (market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)',
+})
+async exportOrders(
   @Res() res: Response,
-  @Query() filter: OrderFilterDto) {
-  const date = new Date().toISOString().slice(0, 10);
+  @Query('marketId') marketId?: string,
+  @Query('status') status?: 'new' | 'accepted' | 'rejected',
+  @Query('from') from?: string,
+  @Query('to') to?: string,
+) {
+  const filter: any = { marketId, status, from, to };
   const buffer = await this.deliverService.exportOrdersToExcel(filter);
-
+  const date = new Date().toISOString().slice(0, 10);
   res.setHeader(
     'Content-Type',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   );
   res.setHeader(
     'Content-Disposition',
-    `attachment; filename=orders_${date}_status=${filter.status || "all"}.xlsx`,
+    `attachment; filename=orders_${date}_status=${status || "all"}.xlsx`,
   );
-
   res.end(buffer);
 }
+
 
 @Post()
 @ApiOperation({summary : 'yangi deliver qo`shish'})

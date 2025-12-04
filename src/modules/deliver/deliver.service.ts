@@ -22,18 +22,23 @@ export class DeliverService {
   }
 async exportOrdersToExcel(filter: OrderFilterDto) {
   const query: Record<string, any> = {};
-  if (filter.marketId) {
-    query.marketId = filter.marketId;
+
+if (filter.marketId) {
+  query.marketId = filter.marketId;
+}
+if (filter.status) {
+  query.status = filter.status;
+}
+if (filter.from || filter.to) {
+  query.createdAt = {};
+  if (filter.from) {
+    query.createdAt.$gte = new Date(filter.from);
   }
-  if (filter.status) {
-    query.status = filter.status;
+  if (filter.to) {
+    query.createdAt.$lte = new Date(filter.to);
   }
-  if (filter.from && filter.to) {
-    query.createdAt = {
-      $gte: new Date(filter.from),
-      $lte: new Date(filter.to),
-    };
-  }
+}
+
 
   const orders = await this.orderRepo
     .find(query)
