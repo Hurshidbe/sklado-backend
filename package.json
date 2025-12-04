@@ -37,6 +37,7 @@
     "mongoose": "^8.19.2",
     "nestjs": "^0.0.1",
     "nestjs-telegraf": "^2.9.1",
+    "nestjs-throttler": "^0.3.0",
     "node-cron": "^4.2.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
