@@ -49,7 +49,7 @@ create(
       const filter : any ={marketId , productId}
       return this.productLimitService.findAll(filter);
     } catch (error) {
-      throw new HttpException(error.message, error.status)
+      throw new HttpException(error.message, error.status||500)
     }
   }
 
@@ -63,7 +63,7 @@ create(
     try {
       return this.productLimitService.findOne(id);
     } catch (error) {
-      throw new HttpException(error.message , error.status)    
+      throw new HttpException(error.message , error.status||500)    
     }
   }
 
@@ -81,7 +81,7 @@ create(
     try {
       return this.productLimitService.update(id, updateProductLimitDto);
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 
@@ -95,7 +95,7 @@ create(
     try {
       return this.productLimitService.remove(id);
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 }

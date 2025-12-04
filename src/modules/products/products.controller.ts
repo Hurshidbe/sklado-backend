@@ -39,9 +39,7 @@ export class ProductsController {
   async findOne(@Param('id') id: string) {
     try {
       const product = await this.productsService.findOne(id);
-      if (!product) {
-        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
-      }
+      if (!product) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       return product;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -57,9 +55,7 @@ export class ProductsController {
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     try {
       const updated = await this.productsService.update(id, updateProductDto);
-      if (!updated) {
-        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
-      }
+      if (!updated) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       return updated;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -75,9 +71,7 @@ export class ProductsController {
   async remove(@Param('id') id: string) {
     try {
       const result = await this.productsService.remove(id);
-      if (result.deletedCount === 0) {
-        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
-      }
+      if (result.deletedCount === 0) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       return { message: 'Product successfully deleted' };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

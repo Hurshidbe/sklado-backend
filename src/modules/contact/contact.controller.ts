@@ -11,7 +11,6 @@ export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
   @UseGuards(MarketGuard)
-
   @Post()
   @ApiOperation({summary : `market/deliverga message yuborish`})
   async sendMessage(@Req() req : any, @Body() body: MessageDto){

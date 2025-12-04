@@ -31,7 +31,7 @@ export class OrdersController {
     try {
       return await this.ordersService.create(body, req.market.id);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -52,7 +52,7 @@ export class OrdersController {
         limitNum,
       });
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -62,7 +62,7 @@ export class OrdersController {
     try {
       return await this.ordersService.findAllProducts();
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -72,7 +72,7 @@ export class OrdersController {
     try {
       return await this.ordersService.findoneProduct(id);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -82,7 +82,7 @@ export class OrdersController {
     try {
       return await this.ordersService.findOne(id, req.market.id);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -96,7 +96,7 @@ export class OrdersController {
     try {
       return await this.ordersService.update(id, req.market.id, body);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 
@@ -106,7 +106,7 @@ export class OrdersController {
     try {
       return await this.ordersService.remove(id, req.market.id);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status||500);
     }
   }
 }

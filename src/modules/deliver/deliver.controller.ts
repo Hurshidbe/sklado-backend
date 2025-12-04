@@ -31,7 +31,7 @@ export class DeliverController {
     try {
       return await this.deliverService.getOrderById(id)
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 
@@ -42,7 +42,7 @@ export class DeliverController {
     try {
       return await this.deliverService.getOwnProfile(req.user.id)
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 
@@ -79,7 +79,7 @@ async all(
     try {
       return await this.orderService.setAccepted(id)
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 
@@ -94,7 +94,7 @@ async all(
     try {
       return await this.orderService.setDelivered(id)
     } catch (error) {
-      throw new HttpException(error.message , error.status)
+      throw new HttpException(error.message , error.status||500)
     }
   }
 
@@ -128,6 +128,7 @@ async exportOrders(
   @Query('from') from?: string,
   @Query('to') to?: string,
 ) {
+  try {
   const filter: any = { marketId, status, from, to };
   const buffer = await this.deliverService.exportOrdersToExcel(filter);
   const date = new Date().toISOString().slice(0, 10);
@@ -140,6 +141,9 @@ async exportOrders(
     `attachment; filename=orders_${date}_status=${status || "all"}.xlsx`,
   );
   res.end(buffer);
+  } catch (error) {
+    throw new HttpException(error.message , error.status ||500)
+  }
 }
 
 
@@ -150,7 +154,7 @@ async createNewDeliver(@Body() dto : CreateDeliverDto){
     return await this.deliverService.createDeliver(dto)
   } catch (error) {
     console.log(error)
-    throw new BadRequestException(error.message , error.status)
+    throw new BadRequestException(error.message , error.status||500)
   }
 }
 
@@ -164,7 +168,7 @@ async updateDeliverById(@Param('id') id : string, @Body() dto : UpdateDeliverDto
   try {
     return await this.deliverService.updateDeliver(dto , id)
   } catch (error) {
-    throw new HttpException(error.message , error.status)
+    throw new HttpException(error.message , error.status||500)
   }
 }
 
@@ -193,7 +197,7 @@ async getOneDeliver(
   try {
     return await this.deliverService.deliversById(id)
   } catch (error) {
-    throw new HttpException(error.message , error.status)
+    throw new HttpException(error.message , error.status||500)
   }
 }
 
@@ -212,7 +216,7 @@ async MarketChat(
     return await this.contanctService.findMarketChat(marketId)
   } catch (error) {
     console.log(error)
-    throw new HttpException(error.meesage , error.status)
+    throw new HttpException(error.meesage , error.status||500)
   }
 }
 
@@ -237,7 +241,7 @@ async allMessages(){
   try {
     return await this.contanctService.findAll()
   } catch (error) {
-    throw new HttpException(error.meesage , error.status)
+    throw new HttpException(error.meesage , error.status||500)
   }
 }
 }

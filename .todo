@@ -8,8 +8,10 @@
           "content": "important/ UTC problem",
           "id": 1764088378959,
           "level": "default",
-          "done": false,
-          "start": 1764088378959
+          "done": true,
+          "start": 1764088378959,
+          "focus": false,
+          "end": 1764849616821
         }
       },
       {
@@ -19,8 +21,10 @@
           "content": "importand/ Fix product-limit logic",
           "id": 1764088401341,
           "level": "default",
-          "done": false,
-          "start": 1764088401341
+          "done": true,
+          "start": 1764088401341,
+          "focus": false,
+          "end": 1764849620634
         }
       },
       {
@@ -30,8 +34,10 @@
           "content": "secondary/ Check all endpoints security",
           "id": 1764088423727,
           "level": "default",
-          "done": false,
-          "start": 1764088423727
+          "done": true,
+          "start": 1764088423727,
+          "focus": false,
+          "end": 1764849626441
         }
       },
       {
@@ -41,8 +47,10 @@
           "content": "optional/    Add bcrypt to all password used schemas",
           "id": 1764088447564,
           "level": "default",
-          "done": false,
-          "start": 1764088447564
+          "done": true,
+          "start": 1764088447564,
+          "focus": false,
+          "end": 1764849629187
         }
       }
     ],
@@ -58,6 +66,6 @@
     "showEndTime": false,
     "simpleMode": false,
     "lang": "en",
-    "version": "1764088499721"
+    "version": "1764849629214"
   }
 }
