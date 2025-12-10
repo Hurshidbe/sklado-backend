@@ -127,10 +127,8 @@ async findOne(id: string , marketId : string) {
 
 async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   await this.isOwnOrder(orderId, marketId);
-
   const order = await this.orderRepo.findById(orderId);
   if (!order) throw new NotFoundException('Order not found');
-
   if (order.status !== 'new') {
     throw new BadRequestException(
       `your order already ${order.status}. you can not edit it`,
@@ -138,9 +136,7 @@ async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   }
   for (const item of updateData.products) {
     const product = await this.productRepo.findById(item.productId);
-    if (!product)
-      throw new NotFoundException(`Product ${item.productId} not found`);
-
+    if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
     await this.productLimitService.checkProductLimit(
       item.productId.toString(),
       marketId,
@@ -150,6 +146,20 @@ async update(orderId: string, marketId: string, updateData: CreateOrderDto) {
   const mergedProducts = this.mergeProducts(updateData.products);
   order.products = mergedProducts as any;
 
+  await order.save();
+  return order;
+}
+
+async updateByDeliver(orderId: string, updateData: CreateOrderDto) {
+  const order = await this.orderRepo.findById(orderId);
+  if (!order) throw new NotFoundException('Order not found');
+  if (order.status !== 'new') {
+    throw new BadRequestException(
+      `order already ${order.status}. you can not edit it`,
+    );
+  }
+  const mergedProducts = this.mergeProducts(updateData.products);
+  order.products = mergedProducts as any;
   await order.save();
   return order;
 }
@@ -202,7 +212,12 @@ async remove(orderId: string, marketId: string) {
   await this.orderRepo.findByIdAndDelete(orderId);
   return { message: 'Order deleted successfully' };
 }
-
+async removeByDeliver(orderId: string) {
+  const order = await this.orderRepo.findById(orderId);
+  if (!order) throw new NotFoundException('Order not found');
+  await this.orderRepo.findByIdAndDelete(orderId);
+  return { message: 'Order deleted successfully' };
+}
 async isOwnOrder(orderId: string, marketId: string): Promise<boolean> {
   const order = await this.orderRepo.findById(orderId);
   if (!order) return false;

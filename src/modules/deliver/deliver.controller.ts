@@ -6,7 +6,7 @@ import MarketGuard from 'src/guards/marketGuard';
 import { OrdersService } from '../orders/orders.service';
 import DeliverGuard from 'src/guards/deliverGuard';
 import type { Request, Response } from 'express';
-import { OrderFilterDto } from '../orders/dto/create-order.dto';
+import { CreateOrderDto, OrderFilterDto } from '../orders/dto/create-order.dto';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ContactService } from '../contact/contact.service';
 import { message } from 'telegraf/filters';
@@ -67,6 +67,42 @@ async all(
   return await this.orderService.find(filter, pageNum, limitNum);
 }
 
+ @UseGuards(DeliverGuard)            //I know, creating this endpoint isn't good practice, but client wanted it
+ @Patch('order/:id')
+ @ApiOperation({summary : 'deliver/ istalga orderni Id si orqali update qilish (faqat order status === `new`)'})
+ @ApiParam({
+  name : 'id',
+  type : String,
+  description : 'order Id si'
+ })
+ async updateOneOrder(
+  @Param('id') id : string,
+  @Body() dto : CreateOrderDto
+ ){
+  try {
+    return await this.orderService.updateByDeliver(id , dto)
+  } catch (error) {
+    throw new HttpException(error.message , error.status||500)
+  }
+ }
+
+ @UseGuards(DeliverGuard)
+ @Delete('order/:id')
+ @ApiOperation({summary : 'deliver / istalga orderni butunlay o`chirib yuuborish'})
+ @ApiParam({
+  name : 'id',
+  type : String ,
+  description : 'istalgan orderni Id si orqali butunlayga o`chirish'
+ })
+ async removeOrder(
+  @Param('id')id : string
+ ){
+  try {
+    return await this.orderService.removeByDeliver(id)
+  } catch (error) {
+    throw new HttpException(error.message , error.status|| 500)
+  }
+ }
 
   @UseGuards(DeliverGuard)
   @Patch(':id/accept-order')
