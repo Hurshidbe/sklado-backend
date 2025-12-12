@@ -1,9 +1,9 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductLimit } from './entities/product-limit.entity';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { Model, mongo, Types } from 'mongoose';
 import { Order } from '../orders/entities/order.entity';
 import { Product } from '../products/entities/product.entity';
 import { error } from 'console';
@@ -40,6 +40,12 @@ export class ProductLimitService {
 
   async remove(id: string) {
     return await this.LimitsRepo.findByIdAndDelete(id);
+  }
+
+  async findOwnLimits(id : string){
+    const marketId = new mongoose.Types.ObjectId(id)
+    if(!id) throw new NotFoundException('markedId is not defined')
+    return await this.LimitsRepo.find({marketId})
   }
 
  async checkProductLimit(productId: string, marketId: string, amount: number) {

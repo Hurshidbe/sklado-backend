@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Query,} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, Query, Req,} from '@nestjs/common';
 import { ProductLimitService } from './product-limit.service';
 import { CreateProductLimitDto } from './dto/create-product-limit.dto';
 import { UpdateProductLimitDto } from './dto/update-product-limit.dto';
@@ -6,11 +6,25 @@ import DeliverGuard from 'src/guards/deliverGuard';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { UpdateMarketDto } from '../markets/dto/update-market.dto';
+import MarketGuard from 'src/guards/marketGuard';
 
-@UseGuards(DeliverGuard)
+// @UseGuards(DeliverGuard)
 @Controller('product-limit')
 export class ProductLimitController {
   constructor(private readonly productLimitService: ProductLimitService) {}
+
+@UseGuards(MarketGuard)
+@Get('own')
+@ApiOperation({summary : 'market / o`ziga tegishli bo`lgan barcha mahsulot limitlarini ko`rish'})
+async getAllOwnLimits(
+  @Req() req : any
+){
+  try {
+    return await this.productLimitService.findOwnLimits(req.market.id)
+  } catch (error) {
+    throw new HttpException(error.message , error.status ||500)
+  }
+}
 
 @Post(':marketId/:productId')                                                          //  worked
 @ApiOperation({ summary: 'biror product uchun limit qo`yish (ex: 7 kun uchun 70kg )' })
@@ -98,4 +112,6 @@ create(
       throw new HttpException(error.message , error.status||500)
     }
   }
+
+ 
 }

@@ -15,6 +15,7 @@ import DeliverGuard from './guards/deliverGuard';
 import MarketGuard from './guards/marketGuard';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { ContactModule } from './modules/contact/contact.module';
+import { ProductCategoryModule } from './modules/product-category/product-category.module';
 dotenv.config()
 
 @Module({
@@ -34,7 +35,7 @@ dotenv.config()
             }
           }
         }),
-     AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule, ContactModule],
+     AuthModule, MarketsModule, ProductsModule, OrdersModule, ProductLimitModule, ContactModule, ProductCategoryModule],
   controllers: [],
   providers: [DeliverSeed, DeliverGuard, MarketGuard],
 })
