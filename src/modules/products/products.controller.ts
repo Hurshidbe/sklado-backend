@@ -4,6 +4,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import DeliverGuard from 'src/guards/deliverGuard';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { HttpAdapterHost } from '@nestjs/core';
 
 @UseGuards(DeliverGuard)
 @Controller('products')
@@ -17,6 +18,23 @@ export class ProductsController {
       return await this.productsService.create(createProductDto);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('by-category/:id')
+  @ApiOperation({summary : 'productni ko`rish ById'})
+  @ApiParam({
+    name : 'id',
+    example : '690797eefdec07bb92b752e2',
+    required : true
+  })
+  async getProductsBycategory(
+    @Param('id') id : string
+  ){
+    try {
+      return await this.productsService.getByCategory(id)
+    } catch (error) {
+      throw new HttpException(error.message  , error.status ||500)
     }
   }
 

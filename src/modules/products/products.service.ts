@@ -3,11 +3,13 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './entities/product.entity';
-import { Model } from 'mongoose';
+import mongoose, { Model, mongo } from 'mongoose';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private readonly ProductRepo : Model<Product>){}
+  constructor(
+    @InjectModel(Product.name) private readonly ProductRepo : Model<Product>
+  ){}
   async create(createProductDto: CreateProductDto) {
     return await this.ProductRepo.create(createProductDto);
   }
@@ -26,5 +28,10 @@ export class ProductsService {
 
   async remove(id: string) {
     return await this.ProductRepo.deleteOne({_id : id});
+  }
+
+  async getByCategory(id : string){
+    const cId = new mongoose.Types.ObjectId(id)
+    return await this.ProductRepo.find({category : cId})
   }
 }
