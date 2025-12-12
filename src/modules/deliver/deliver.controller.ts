@@ -57,15 +57,16 @@ async all(
   @Query('status') status?: 'new' | 'accepted' | 'rejected',
   @Query('from') from?: string,
   @Query('to') to?: string,
-  @Query('page') page : string ='1' ,
-  @Query('limit') limit : string ='10'
-
+  @Query('categoryId') categoryId?: string, 
+  @Query('page') page: string = '1',
+  @Query('limit') limit: string = '10',
 ) {
-  const pageNum = parseInt(page)
-  const limitNum = parseInt(limit)
-  const filter: any = { marketId, status, from, to };
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const filter: any = { marketId, status, from, to, categoryId };
   return await this.orderService.find(filter, pageNum, limitNum);
 }
+
 
  @UseGuards(DeliverGuard)            //I know, creating this endpoint isn't good practice, but client wanted it
  @Patch('order/:id')

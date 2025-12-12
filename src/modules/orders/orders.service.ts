@@ -42,11 +42,12 @@ export class OrdersService {
 }
 
 async find(
-  filter: { marketId?: string; status?: string; from?: string; to?: string },
+  filter: { marketId?: string; status?: string; from?: string; to?: string; categoryId?: string },
   pageNum: number,
-  limitNum: number
+  limitNum: number,
 ) {
   const query: any = {};
+
   if (filter.marketId) {
     try {
       query.marketId = new Types.ObjectId(filter.marketId);
@@ -56,23 +57,41 @@ async find(
   }
 
   if (filter.status) query.status = filter.status;
+
   if (filter.from || filter.to) {
-  query.createdAt = {};
-  if (filter.from) query.createdAt.$gte = new Date(filter.from);
-  if (filter.to)query.createdAt.$lte = new Date(filter.to); 
-}
+    query.createdAt = {};
+    if (filter.from) query.createdAt.$gte = new Date(filter.from);
+    if (filter.to) query.createdAt.$lte = new Date(filter.to);
+  }
 
   const skip = (pageNum - 1) * limitNum;
-  const orders = await this.orderRepo
+
+  let ordersQuery = this.orderRepo
     .find(query, '-__v')
     .sort({ createdAt: -1 })
     .populate('marketId', 'name phone')
-    .populate('products.productId', 'name')
+    .populate({
+      path: 'products.productId',
+      select: 'name category',
+      populate: filter.categoryId
+    ? { path: 'category', match: { _id: filter.categoryId } }
+    : undefined,
+})
+
     .skip(skip)
     .limit(limitNum)
     .lean();
 
-  if (!orders.length) {
+  const orders = await ordersQuery;
+
+  // Filter out orders that don't have matching category (if filter applied)
+  const filteredOrders = filter.categoryId
+    ? orders.filter(o =>
+        o.products.some(p => p.productId && p.productId.category),
+      )
+    : orders;
+
+  if (!filteredOrders.length) {
     return {
       total: 0,
       page: pageNum,
@@ -87,9 +106,10 @@ async find(
     total,
     page: pageNum,
     limit: limitNum,
-    data: orders,
+    data: filteredOrders,
   };
 }
+
 
 
 
