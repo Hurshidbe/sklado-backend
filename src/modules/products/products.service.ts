@@ -31,7 +31,6 @@ export class ProductsService {
   }
 
   async getByCategory(id : string){
-    const cId = new mongoose.Types.ObjectId(id)
-    return await this.ProductRepo.find({category : cId})
+    return await this.ProductRepo.find({category : id})
   }
 }

@@ -11,8 +11,8 @@ export class Product extends Document {
     @Prop({enum :['piece', 'liter', 'kg', 'm' ]})
     unit : string
 
-    @Prop({type : Types.ObjectId, ref : ProductCategory.name})
-    category : ProductCategory
+    @Prop({type : Types.ObjectId, ref : ProductCategory.name, })
+    category? : ProductCategory
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
