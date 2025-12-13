@@ -6,11 +6,10 @@ import DeliverGuard from 'src/guards/deliverGuard';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { HttpAdapterHost } from '@nestjs/core';
 
-@UseGuards(DeliverGuard)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-
+  @UseGuards(DeliverGuard)
   @Post()
   @ApiOperation({summary : 'yangi product qo`shish'})
   async create(@Body() createProductDto: CreateProductDto) {
@@ -37,7 +36,7 @@ export class ProductsController {
       throw new HttpException(error.message  , error.status ||500)
     }
   }
-
+  @UseGuards(DeliverGuard)
   @Get()
   @ApiOperation({summary : 'barcha productlar ro`yhati'})
   async findAll() {
@@ -47,7 +46,7 @@ export class ProductsController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(DeliverGuard)
   @Get(':id')
   @ApiOperation({summary : 'productni ko`rish ById'})
   @ApiParam({
@@ -63,7 +62,7 @@ export class ProductsController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(DeliverGuard)
   @Patch(':id')
   @ApiOperation({summary : 'product ni taxrirlash'})
   @ApiParam({
@@ -79,7 +78,7 @@ export class ProductsController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  @UseGuards(DeliverGuard)
   @Delete(':id')
   @ApiOperation({summary : 'productni chopish ById'})
     @ApiParam({

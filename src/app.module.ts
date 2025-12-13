@@ -31,7 +31,7 @@ dotenv.config()
           useFactory:(ConfigService : ConfigService) =>{
             return {
               secret : ConfigService.get('JWT'),
-              signOptions :{expiresIn : '3h'}
+              signOptions :{expiresIn : '30h'}
             }
           }
         }),

@@ -22,7 +22,7 @@ async loginDdeliver(
     res.cookie('AuthToken', token, {
       httpOnly: true,
       secure: true,             
-      maxAge: 4 * 60 * 60 * 1000,
+      maxAge: 30 * 60 * 60 * 1000,
     });
 
     return { message };
@@ -41,7 +41,7 @@ async loginDdeliver(
     res.cookie('AuthToken', token, {
       httpOnly: true,
       secure: true,             
-      maxAge: 4 * 60 * 60 * 1000,
+      maxAge: 30 * 60 * 60 * 1000,
     });
 
     return { message };
