@@ -221,6 +221,24 @@ async allDelivers(){
 }
 
 @UseGuards(DeliverGuard)
+@Get(':id')
+@ApiOperation({summary : 'deliverni idsi bo`yicha o`chirish'})
+@ApiParam({
+  name : 'id',
+  type : String,
+  required : true
+})
+async deleteOneDeliver(
+  @Param('id') id : string
+){
+  try {
+    return await this.deliverService.removeById(id)
+  } catch (error) {
+    throw new HttpException(error.message , error.status||500)
+  }
+}
+
+@UseGuards(DeliverGuard)
 @Get(':id/deliver')
 @ApiOperation({summary : 'deliverni idsi bo`yicha olish'})
 @ApiParam({

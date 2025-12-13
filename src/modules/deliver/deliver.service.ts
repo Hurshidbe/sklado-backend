@@ -148,4 +148,8 @@ async allDelivers(){
 async deliversById(id  :string){
   return await this.deliverRepo.findById(id).select('-password')
 }
+
+async removeById(id : string) {
+  return await this.deliverRepo.findByIdAndDelete(id)
+}
 }
