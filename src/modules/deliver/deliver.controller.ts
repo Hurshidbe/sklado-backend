@@ -231,7 +231,7 @@ async allDelivers(){
 }
 
 @UseGuards(DeliverGuard)
-@Get(':id')
+@Delete(':id')
 @ApiOperation({summary : 'deliverni idsi bo`yicha o`chirish'})
 @ApiParam({
   name : 'id',
