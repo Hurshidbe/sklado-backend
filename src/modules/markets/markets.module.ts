@@ -7,11 +7,13 @@ import { Market, MarketSchema } from './entities/market.entity';
 import { OrdersService } from '../orders/orders.service';
 import { OrdersModule } from '../orders/orders.module';
 import { Order, OrderSchema } from '../orders/entities/order.entity';
+import { Contact, ContactSchema } from '../contact/entities/contact.entity';
 
 @Module({
   imports :[
     MongooseModule.forFeature([
       {name : Market.name , schema : MarketSchema},
+      {name : Contact.name , schema : ContactSchema}
     ]),
     OrdersModule
   ],

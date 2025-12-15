@@ -20,8 +20,8 @@ export class DeliverController {
     private readonly contanctService : ContactService
   ) {}
 @UseGuards(DeliverGuard)
-@Get('messages')
-@ApiOperation({summary : 'hamma messagelarni olib keladi'})
+@Get('messages')                                         
+@ApiOperation({summary : 'hamma messagelarni olib keladi'})    
 async allMessages(){
   try {
     return await this.contanctService.findAll()

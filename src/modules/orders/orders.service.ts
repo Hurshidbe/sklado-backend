@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException, Type } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
@@ -216,7 +216,7 @@ async setRejected(id : string){
   return await this.orderRepo.findByIdAndUpdate(id , {status : 'rejected'}, {new : true})
 }
 
-async removeMarketAllOrders(id: string){
+async removeMarketAllOrders(id: mongoose.Types.ObjectId){
   return await this.orderRepo.deleteMany({marketId : id})
 }
 

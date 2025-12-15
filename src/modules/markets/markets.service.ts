@@ -5,10 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Market } from './entities/market.entity';
 import { Model } from 'mongoose';
 import { OrdersService } from '../orders/orders.service';
+import { Contact } from '../contact/entities/contact.entity';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class MarketsService {
   constructor(
+    @InjectModel(Contact.name) private readonly contactRepo : Model<Contact>,
     @InjectModel(Market.name) private readonly MarketRepo : Model<Market>,
     private readonly orderService : OrdersService
   ){}
@@ -30,7 +33,9 @@ export class MarketsService {
   }
 
   async remove(id: string) {
-    await this.orderService.removeMarketAllOrders(id)
-    return await this.MarketRepo.deleteOne({_id:id},);
+    const objectId = new Types.ObjectId(id)
+    await this.orderService.removeMarketAllOrders(objectId)
+    await this.contactRepo.deleteMany({$or :[{from : objectId}, {to : objectId}]})
+    return await this.MarketRepo.deleteOne({_id:objectId},);
   }
 }

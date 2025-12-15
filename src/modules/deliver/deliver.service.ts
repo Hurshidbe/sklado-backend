@@ -77,7 +77,7 @@ if (filter.from || filter.to) {
 
   const orderKeys = Array.from(orderProductMap.keys());
   worksheet.columns = [
-    { header: 'Products \ Markets ', key: 'productName', width: 28 },
+    { header: 'Products / Markets ', key: 'productName', width: 28 },
     ...orderKeys.map(key => ({
       header: key,
       key,
