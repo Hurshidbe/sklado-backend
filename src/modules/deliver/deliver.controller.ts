@@ -19,7 +19,17 @@ export class DeliverController {
     private readonly orderService : OrdersService,
     private readonly contanctService : ContactService
   ) {}
-
+@UseGuards(DeliverGuard)
+@Get('messages')
+@ApiOperation({summary : 'hamma messagelarni olib keladi'})
+async allMessages(){
+  try {
+    return await this.contanctService.findAll()
+  } catch (error) {
+    console.log(error)
+    throw new HttpException(error.meesage , error.status||500)
+  }
+}
   @UseGuards(DeliverGuard)
   @Get('orders/:id')
   @ApiOperation({summary : 'buyurtmani ko`rish ById'})
@@ -289,14 +299,5 @@ async send(
   }
 }
 
-@UseGuards(DeliverGuard)
-@Get('messages')
-@ApiOperation({summary : 'hamma messagelarni olib keladi'})
-async allMessages(){
-  try {
-    return await this.contanctService.findAll()
-  } catch (error) {
-    throw new HttpException(error.meesage , error.status||500)
-  }
-}
+
 }

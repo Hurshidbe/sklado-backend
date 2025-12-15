@@ -150,6 +150,8 @@ async deliversById(id  :string){
 }
 
 async removeById(id : string) {
+  const deliver = await this.deliverRepo.findById(id)
+  if(!deliver || deliver.phone===process.env.D_PHONE) throw new BadRequestException('you can not remove superadmin')
   return await this.deliverRepo.findByIdAndDelete(id)
 }
 }
