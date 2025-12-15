@@ -162,11 +162,11 @@ async all(
 
 
 
-  @UseGuards(DeliverGuard)
+@UseGuards(DeliverGuard)
 @Get('export')
 @ApiOperation({
   summary: `Barcha buyurtmalarni chop etish (Excel shaklida yuklash) || query qabul qiladi`,
-  description: 'query elements: (market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date)',
+  description: 'query elements: (market?: marketId); (status?: new || accepted || rejected); (from?: Date); (to?: Date); (categoryId?: string)',
 })
 async exportOrders(
   @Res() res: Response,
@@ -174,22 +174,27 @@ async exportOrders(
   @Query('status') status?: 'new' | 'accepted' | 'rejected',
   @Query('from') from?: string,
   @Query('to') to?: string,
+  @Query('categoryId') categoryId?: string, 
 ) {
   try {
-  const filter: any = { marketId, status, from, to };
-  const buffer = await this.deliverService.exportOrdersToExcel(filter);
-  const date = new Date().toISOString().slice(0, 10);
-  res.setHeader(
-    'Content-Type',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  );
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename=orders_${date}_status=${status || "all"}.xlsx`,
-  );
-  res.end(buffer);
+    const filter: any = { marketId, status, from, to, categoryId }; 
+    const buffer = await this.deliverService.exportOrdersToExcel(filter);
+    
+    const date = new Date().toISOString().slice(0, 10);
+    const statusText = status || "all";
+    const categoryText = categoryId ? `_category=${categoryId}` : "";
+    
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=orders_${date}_status=${statusText}${categoryText}.xlsx`,
+    );
+    res.end(buffer);
   } catch (error) {
-    throw new HttpException(error.message , error.status ||500)
+    throw new HttpException(error.message, error.status || 500);
   }
 }
 

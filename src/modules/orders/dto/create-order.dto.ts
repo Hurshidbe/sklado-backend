@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsMongoId, IsNotEmpty, IsNumber, Min } from "class-validator";
+import { IsArray, IsIn, IsMongoId, IsNotEmpty, IsNumber, Min } from "class-validator";
 
 class ProductItem {
   @ApiProperty({type : 'string' , default : '690648ec1d2854575b18ffb1'})
@@ -21,23 +21,42 @@ export class CreateOrderDto {
 import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class OrderFilterDto {
-  @ApiProperty({ type: String, enum: ['new', 'accepted', 'rejected', 'delivered'], required: false })
+  @ApiProperty({
+    type: String,
+    enum: ['new', 'accepted', 'rejected', 'delivered'],
+    required: false,
+  })
   @IsOptional()
-  @IsString()
+  @IsIn(['new', 'accepted', 'rejected', 'delivered'])
   status?: 'new' | 'accepted' | 'rejected' | 'delivered';
 
-  @ApiProperty({ type: String, format: 'date-time', required: false })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    required: false,
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   from?: string;
 
-  @ApiProperty({ type: String, format: 'date-time', required: false })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    required: false,
+    example: '2024-01-31',
+  })
   @IsOptional()
   @IsDateString()
   to?: string;
 
   @ApiProperty({ type: String, required: false })
   @IsOptional()
-  @IsString()
+  @IsMongoId()
   marketId?: string;
+
+  @ApiProperty({ type: String, required: false })
+  @IsOptional()
+  @IsMongoId()
+  categoryId?: string;
 }
