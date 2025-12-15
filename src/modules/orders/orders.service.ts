@@ -22,7 +22,7 @@ export class OrdersService {
 
  async create(body: CreateOrderDto, marketId: string) {
   const isMarketExist = await this.marketRepo.findById(marketId)
-  if(!isMarketExist) throw new BadRequestException('you can not create order anymore')
+  if(!isMarketExist) throw new BadRequestException('you can not create order')
   await this.limitedCreate(marketId);
 
   for (const item of body.products) {
@@ -43,76 +43,179 @@ export class OrdersService {
   return order.save();
 }
 
+
 async find(
   filter: { marketId?: string; status?: string; from?: string; to?: string; categoryId?: string },
   pageNum: number,
   limitNum: number,
 ) {
-  const query: any = {};
+  const matchStage: any = {};
 
   if (filter.marketId) {
     try {
-      query.marketId = new Types.ObjectId(filter.marketId);
+      matchStage.marketId = new Types.ObjectId(filter.marketId);
     } catch (error) {
       throw new BadRequestException('Invalid marketId format');
     }
   }
 
-  if (filter.status) query.status = filter.status;
+  if (filter.status) matchStage.status = filter.status;
 
   if (filter.from || filter.to) {
-    query.createdAt = {};
-    if (filter.from) query.createdAt.$gte = new Date(filter.from);
-    if (filter.to) query.createdAt.$lte = new Date(filter.to);
+    matchStage.createdAt = {};
+    if (filter.from) matchStage.createdAt.$gte = new Date(filter.from);
+    if (filter.to) matchStage.createdAt.$lte = new Date(filter.to);
   }
 
-  const skip = (pageNum - 1) * limitNum;
+  const pipeline: any[] = [{ $match: matchStage }];
 
-  let ordersQuery = this.orderRepo
-    .find(query, '-__v')
-    .sort({ createdAt: -1 })
-    .populate('marketId', 'name phone')
-    .populate({
-      path: 'products.productId',
-      select: 'name category',
-      populate: filter.categoryId
-    ? { path: 'category', match: { _id: filter.categoryId } }
-    : undefined,
-})
+  pipeline.push({
+    $lookup: {
+      from: 'markets',
+      localField: 'marketId',
+      foreignField: '_id',
+      as: 'marketInfo'
+    }
+  });
 
-    .skip(skip)
-    .limit(limitNum)
-    .lean();
+  pipeline.push({
+    $unwind: {
+      path: '$marketInfo',
+      preserveNullAndEmptyArrays: true
+    }
+  });
 
-  const orders = await ordersQuery;
+  pipeline.push({
+    $lookup: {
+      from: 'products',
+      localField: 'products.productId',
+      foreignField: '_id',
+      as: 'productInfo'
+    }
+  });
 
-  // Filter out orders that don't have matching category (if filter applied)
-  const filteredOrders = filter.categoryId
-    ? orders.filter(o =>
-        o.products.some(p => p.productId && p.productId.category),
-      )
-    : orders;
-
-  if (!filteredOrders.length) {
-    return {
-      total: 0,
-      page: pageNum,
-      limit: limitNum,
-      data: [],
-    };
+  if (filter.categoryId) {
+    pipeline.push({
+      $addFields: {
+        products: {
+          $filter: {
+            input: {
+              $map: {
+                input: '$products',
+                as: 'product',
+                in: {
+                  $mergeObjects: [
+                    '$$product',
+                    {
+                      productDetails: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: '$productInfo',
+                              as: 'prodInfo',
+                              cond: {
+                                $eq: ['$$prodInfo._id', '$$product.productId']
+                              }
+                            }
+                          },
+                          0
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            as: 'productWithDetails',
+            cond: {
+              $eq: [
+                { $toString: '$$productWithDetails.productDetails.category' },
+                filter.categoryId
+              ]
+            }
+          }
+        }
+      }
+    });
+  } else {
+    pipeline.push({
+      $addFields: {
+        products: {
+          $map: {
+            input: '$products',
+            as: 'product',
+            in: {
+              $mergeObjects: [
+                '$$product',
+                {
+                  productDetails: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: '$productInfo',
+                          as: 'prodInfo',
+                          cond: {
+                            $eq: ['$$prodInfo._id', '$$product.productId']
+                          }
+                        }
+                      },
+                      0
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    });
   }
 
-  const total = await this.orderRepo.countDocuments(query);
+  pipeline.push({
+    $match: {
+      'products.0': { $exists: true }
+    }
+  });
+
+  pipeline.push({
+    $project: {
+      __v: 0,
+      productInfo: 0,
+      'marketInfo.password': 0,
+      'marketInfo.__v': 0,
+      'products.productDetails.__v': 0
+    }
+  });
+
+  pipeline.push({ $sort: { createdAt: -1 } });
+  const countPipeline = [...pipeline];
+  countPipeline.push({ $count: 'total' });
+  pipeline.push({ $skip: (pageNum - 1) * limitNum });
+  pipeline.push({ $limit: limitNum });
+  const [orders, totalCountResult] = await Promise.all([
+    this.orderRepo.aggregate(pipeline).exec(),
+    this.orderRepo.aggregate(countPipeline).exec(),
+  ]);
+
+  const total = totalCountResult[0]?.total || 0;
+
+  const formattedOrders = orders.map(order => ({
+    ...order,
+    marketId: order.marketInfo,
+    products: order.products.map(product => ({
+      productId: product.productDetails,
+      quantity: product.quantity,
+      _id: product._id
+    }))
+  }));
 
   return {
     total,
     page: pageNum,
     limit: limitNum,
-    data: filteredOrders,
+    data: formattedOrders,
   };
 }
-
-
 
 
 async findAllOwn(
