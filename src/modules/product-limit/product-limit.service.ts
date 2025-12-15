@@ -42,6 +42,10 @@ export class ProductLimitService {
     return await this.LimitsRepo.findByIdAndDelete(id);
   }
 
+  async removeByMarketId(id : string){
+  return await this.LimitsRepo.deleteMany({marketId : new mongoose.Types.ObjectId(id)})
+  }
+
   async findOwnLimits(id : string){
     const marketId = new mongoose.Types.ObjectId(id)
     if(!id) throw new NotFoundException('markedId is not defined')

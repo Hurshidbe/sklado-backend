@@ -21,6 +21,8 @@ export class OrdersService {
   ){}
 
  async create(body: CreateOrderDto, marketId: string) {
+  const isMarketExist = await this.marketRepo.findById(marketId)
+  if(!isMarketExist) throw new BadRequestException('you can not create order anymore')
   await this.limitedCreate(marketId);
 
   for (const item of body.products) {

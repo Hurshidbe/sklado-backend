@@ -7,13 +7,16 @@ import { Model } from 'mongoose';
 import { OrdersService } from '../orders/orders.service';
 import { Contact } from '../contact/entities/contact.entity';
 import { Types } from 'mongoose';
+import { ProductLimit } from '../product-limit/entities/product-limit.entity';
+import { ProductLimitService } from '../product-limit/product-limit.service';
 
 @Injectable()
 export class MarketsService {
   constructor(
     @InjectModel(Contact.name) private readonly contactRepo : Model<Contact>,
     @InjectModel(Market.name) private readonly MarketRepo : Model<Market>,
-    private readonly orderService : OrdersService
+    private readonly orderService : OrdersService,
+    private readonly limitService : ProductLimitService
   ){}
 
   async create(createMarketDto: CreateMarketDto) {
@@ -34,6 +37,7 @@ export class MarketsService {
 
   async remove(id: string) {
     const objectId = new Types.ObjectId(id)
+    await this.limitService.removeByMarketId(id)
     await this.orderService.removeMarketAllOrders(objectId)
     await this.contactRepo.deleteMany({$or :[{from : objectId}, {to : objectId}]})
     return await this.MarketRepo.deleteOne({_id:objectId},);

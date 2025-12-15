@@ -12,5 +12,6 @@ import { Contact, ContactSchema } from './entities/contact.entity';
   ],
   controllers: [ContactController],
   providers: [ContactService],
+  exports: [ContactService],
 })
 export class ContactModule {}
