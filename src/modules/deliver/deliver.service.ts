@@ -4,9 +4,7 @@ import { UpdateDeliverDto } from './dto/update-deliver.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from '../orders/entities/order.entity';
 import { Model } from 'mongoose';
-import * as ExcelJS from 'exceljs';
 import { OrderFilterDto } from '../orders/dto/create-order.dto';
-import { transcode } from 'buffer';
 import { Deliver } from './entities/deliver.entity';
 
 
@@ -132,10 +130,6 @@ async exportOrdersToExcel(filter: OrderFilterDto) {
 
   totalRow.total = allTotal;
   worksheet.addRow(totalRow).font = { bold: true };
-
-  console.log('Query:', query);
-const orderss = await this.orderRepo.find(query).lean();
-console.log('Orders length:', orderss.length);
 
   return await workbook.xlsx.writeBuffer();
 }
